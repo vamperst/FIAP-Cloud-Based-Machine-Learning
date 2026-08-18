@@ -1,0 +1,30 @@
+# Credentials never enter this repository. Academy credentials live in the
+# environment or in an AWS profile outside the working tree.
+.env
+.env.*
+.aws/
+*.pem
+*.ppk
+
+# Terraform state describes live infrastructure and can contain sensitive values.
+terraform.tfstate
+terraform.tfstate.*
+.terraform/
+terraform.tfvars
+crash.log
+crash.*.log
+
+# Handoff file written by scripts/wait_training.py during `make apply`.
+terraform/artifact.auto.tfvars.json
+
+# Everything generated at runtime: dataset, predictions, evidence.
+artifacts/
+build/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.mypy_cache/
+.ruff_cache/
