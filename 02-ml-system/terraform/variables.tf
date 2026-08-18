@@ -77,7 +77,7 @@ variable "hyperparameters" {
 }
 
 # --------------------------------------------------------------------------- #
-# Two-stage handoff (see docs/adr/0001-artifact-uri-resolution.md)
+# Two-stage handoff
 # --------------------------------------------------------------------------- #
 
 variable "deploy_serving" {

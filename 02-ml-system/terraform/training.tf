@@ -1,7 +1,6 @@
 # SageMaker training job.
 #
-# Two behaviours of this resource in provider 6.60.0 shape the whole design and
-# are documented in docs/adr/0001-artifact-uri-resolution.md:
+# Two behaviours of this resource in provider 6.60.0 shape the whole design:
 #   1. create returns as soon as the job reaches InProgress - it does NOT wait
 #      for Completed, so a green apply is not a trained model;
 #   2. it exports only `arn` and `tags_all` - there is no computed artifact URI.

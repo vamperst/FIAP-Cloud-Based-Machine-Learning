@@ -67,7 +67,7 @@ def tool_versions(terraform_dir: Path) -> dict[str, object]:
         "platform": f"{platform.system()} {platform.machine()}",
         "terraform": terraform_version,
     }
-    for module in ("boto3", "botocore", "numpy", "sklearn", "pytest"):
+    for module in ("boto3", "botocore", "numpy", "sklearn"):
         try:
             versions[module] = __import__(module).__version__
         except Exception:  # a missing optional tool must not break the report

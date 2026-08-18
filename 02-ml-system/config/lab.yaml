@@ -8,8 +8,8 @@ schema_version: "1.0.0"
 
 region: us-east-1
 
-# Mirrored in terraform/variables.tf. tests/test_config_drift.py fails if the two
-# ever disagree, because verify-clean has to find the bucket after `destroy` has
+# Mirrored in terraform/variables.tf. Keep both in sync manually: there is no
+# automated check, and verify-clean has to find the bucket after `destroy` has
 # already thrown away the Terraform outputs.
 aws:
   execution_role_name: LabRole

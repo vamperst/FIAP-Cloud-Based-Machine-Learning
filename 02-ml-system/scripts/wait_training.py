@@ -11,8 +11,6 @@ about whether a model exists. This script closes that gap:
 3. proves the object exists and is non-empty with `HeadObject`;
 4. writes `terraform/artifact.auto.tfvars.json` so stage two of `make apply`
    needs no copy/paste.
-
-See docs/adr/0001-artifact-uri-resolution.md.
 """
 
 from __future__ import annotations

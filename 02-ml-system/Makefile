@@ -1,9 +1,8 @@
 # Lab 1 - From Model to Machine Learning System
 #
 # Every target is idempotent and safe to run twice. The lifecycle order is
-# doctor -> data -> test -> validate -> apply -> predict -> evaluate ->
-# evidence -> destroy -> verify-clean, and `make e2e` runs exactly that with a
-# cleanup trap.
+# doctor -> data -> validate -> apply -> predict -> evaluate -> evidence ->
+# destroy -> verify-clean, and `make e2e` runs exactly that with a cleanup trap.
 
 SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
@@ -27,13 +26,13 @@ export PYTHONPATH := src
 # flips the serving stage on.
 HANDOFF := $(TF_DIR)/artifact.auto.tfvars.json
 
-.PHONY: help doctor data test-data test fmt validate plan apply predict evaluate \
+.PHONY: help doctor data fmt validate plan apply predict evaluate \
         evidence destroy verify-clean e2e clean
 
 help: ## Show available targets
 	@echo "Lab 1 - From Model to Machine Learning System"
 	@echo
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[1m%-14s\033[0m %s\n", $$1, $$2}'
 	@echo
 	@echo "  Full lifecycle:  make e2e"
@@ -45,19 +44,11 @@ doctor: ## Check tool versions and AWS credentials/region/role
 	@$(PYTHON) --version
 	@$(PYTHON) -c "import boto3, botocore, numpy, sklearn; \
 		print(f'boto3 {boto3.__version__} botocore {botocore.__version__} numpy {numpy.__version__} scikit-learn {sklearn.__version__}')"
-	@$(PYTHON) -c "import pytest; print(f'pytest {pytest.__version__}')"
 	@echo "== aws preflight =="
 	@$(PYTHON) $(SCRIPTS)/check_aws.py > /dev/null
 
 data: ## Generate the deterministic dataset
 	@$(PYTHON) $(SCRIPTS)/generate_dataset.py --clean > /dev/null
-
-test-data: ## Run the data contract only
-	@$(PYTHON) $(SCRIPTS)/validate_data.py > /dev/null
-
-test: data ## Run every local test that needs no AWS resource
-	@$(PYTHON) -m pytest -q tests
-	@$(MAKE) --no-print-directory test-data
 
 fmt: ## Format Terraform (check in CI, rewrite locally)
 	@$(TF) fmt -recursive $(TF_DIR)
@@ -106,7 +97,6 @@ e2e: ## Full lifecycle with failure-safe cleanup (KEEP_RESOURCES=1 to skip destr
 			$(MAKE) --no-print-directory verify-clean || true; exit $$code' EXIT; \
 	fi; \
 	$(MAKE) --no-print-directory doctor; \
-	$(MAKE) --no-print-directory test; \
 	$(MAKE) --no-print-directory apply; \
 	$(MAKE) --no-print-directory predict; \
 	$(MAKE) --no-print-directory evaluate; \

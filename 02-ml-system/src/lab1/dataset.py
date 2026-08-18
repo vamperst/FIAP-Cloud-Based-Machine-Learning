@@ -2,7 +2,7 @@
 
 Why synthetic: the lesson needs every Academy account to run the *same logical
 experiment*. A downloaded dataset can change or disappear independently of this
-repository; a seeded generator cannot. See docs/adr/0002-synthetic-dataset.md.
+repository; a seeded generator cannot.
 
 Determinism contract
 --------------------

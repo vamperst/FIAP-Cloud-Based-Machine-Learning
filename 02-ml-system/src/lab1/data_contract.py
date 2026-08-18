@@ -1,7 +1,7 @@
 """Executable data contract.
 
 The contract is not prose in a README: it is the set of assertions below, run by
-`scripts/validate_data.py` and by pytest *before* any AWS resource is created.
+`scripts/validate_data.py` *before* any AWS resource is created.
 A dataset that violates it never reaches S3, so a failed training job can never
 be blamed on data nobody checked.
 

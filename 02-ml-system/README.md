@@ -26,11 +26,11 @@ custos, troubleshooting). O roteiro pedagógico do aluno é material separado.
 - Por que **computação de treino é finita** e **computação de serving é persistente**, e por
   que só a segunda aparece na fatura depois da aula.
 - Por que a URI do artefato é **lida da API** que a produziu, e não montada por convenção de
-  caminho ([ADR 0001](docs/adr/0001-artifact-uri-resolution.md)).
+  caminho.
 - Por que um contrato de dados só vale se for **executável** — e o que acontece quando o
-  rótulo vaza para o payload de inferência ([docs/data-contract.md](docs/data-contract.md)).
+  rótulo vaza para o payload de inferência.
 - Por que acurácia sozinha não é evidência de valor: baseline majoritário, matriz de
-  confusão, ROC-AUC, PR-AUC, Brier e calibração ([docs/evidence.md](docs/evidence.md)).
+  confusão, ROC-AUC, PR-AUC, Brier e calibração.
 
 ## O que você terá ao final
 
@@ -43,7 +43,6 @@ contra 600 linhas de teste que nunca entraram no treino, com pacote de evidênci
 ```bash
 make doctor        # versões de ferramenta + identidade/região/LabRole na AWS
 make data          # gera o dataset determinístico (semente 20260817)
-make test          # testes locais + contrato de dados (nenhuma chamada AWS)
 make validate      # terraform init + fmt -check + validate
 make plan          # plano do estágio atual
 make apply         # provisiona tudo (dois estágios, um comando - ver ADR 0001)
@@ -104,8 +103,6 @@ Boto3 InvokeEndpoint            600 linhas de teste, sem rótulo, em lotes de 25
 artifacts/evidence/             evaluation.{json,md} + evidence.{json,md}
 ```
 
-Detalhamento das fronteiras e dos trade-offs: [docs/architecture.md](docs/architecture.md).
-
 ## Estrutura
 
 ```text
@@ -114,8 +111,6 @@ Detalhamento das fronteiras e dos trade-offs: [docs/architecture.md](docs/archit
 ├── src/lab1/        dataset, contrato de dados, métricas, helpers AWS
 ├── scripts/         8 scripts de controle e evidência (stdout = resultado)
 ├── terraform/       topologia AWS: s3, training, model, endpoint, outputs
-├── tests/           85 testes locais, nenhum precisa de credencial
-├── docs/            arquitetura, contrato de dados, evidência e 2 ADRs
 └── artifacts/       gerado, gitignored: dados e evidência (descartáveis)
 ```
 
@@ -171,11 +166,3 @@ prepende, o que faria o lab rodar com um interpretador sem `boto3`.
 | `make apply` sem `artifact.auto.tfvars.json` | o estágio 1 não completou | rode `make apply` novamente: os estágios são idempotentes |
 | `ResourceLimitExceeded` | cota de `ml.m5.large` da conta | rode `make destroy` e tente de novo; endpoint órfão de run anterior costuma ser a causa |
 | `verify-clean` reporta job em `ListTrainingJobs` | histórico de job terminado | **não é recurso faturável**; o relatório diz isso explicitamente |
-
-## Documentação
-
-- [docs/architecture.md](docs/architecture.md) — capacidades portáteis e o mapeamento AWS
-- [docs/data-contract.md](docs/data-contract.md) — features, rótulo, splits e o contrato de payload
-- [docs/evidence.md](docs/evidence.md) — o que cada camada de evidência prova
-- [docs/adr/0001-artifact-uri-resolution.md](docs/adr/0001-artifact-uri-resolution.md) — treino → model no provider 6.60.0
-- [docs/adr/0002-synthetic-dataset.md](docs/adr/0002-synthetic-dataset.md) — por que dados sintéticos determinísticos
