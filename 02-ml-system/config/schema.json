@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0.0",
+  "label": "churn",
+  "id_column": "observation_id",
+  "feature_order": [
+    "tenure_months",
+    "monthly_charges",
+    "support_calls_90d",
+    "payment_delay_days",
+    "usage_score",
+    "annual_contract",
+    "premium_plan"
+  ],
+  "columns": {
+    "observation_id": {"dtype": "int64", "role": "identifier", "in_model_input": false},
+    "tenure_months": {"dtype": "int64", "role": "feature", "unit": "months", "decimals": 0},
+    "monthly_charges": {"dtype": "float64", "role": "feature", "unit": "currency", "decimals": 2},
+    "support_calls_90d": {"dtype": "int64", "role": "feature", "unit": "count", "decimals": 0},
+    "payment_delay_days": {"dtype": "float64", "role": "feature", "unit": "days", "decimals": 2},
+    "usage_score": {"dtype": "float64", "role": "feature", "unit": "score", "decimals": 2},
+    "annual_contract": {"dtype": "int64", "role": "feature", "unit": "binary", "decimals": 0},
+    "premium_plan": {"dtype": "int64", "role": "feature", "unit": "binary", "decimals": 0},
+    "churn": {"dtype": "int64", "role": "label", "unit": "binary", "decimals": 0}
+  },
+  "serving": {
+    "content_type": "text/csv",
+    "header": false,
+    "label_present": false,
+    "column_count": 7
+  },
+  "training": {
+    "content_type": "text/csv",
+    "header": false,
+    "label_present": true,
+    "label_position": "first",
+    "column_count": 8
+  }
+}

@@ -1,0 +1,58 @@
+# Single source of truth for the Python side of Lab 1.
+# Terraform-side constants (image URI, instance types, hyperparameters) live in
+# terraform/variables.tf so that the IaC stays readable on its own; the values
+# that BOTH sides depend on are the S3 prefixes, and those flow from Terraform
+# outputs into Python (never the other way around).
+
+schema_version: "1.0.0"
+
+region: us-east-1
+
+# Mirrored in terraform/variables.tf. tests/test_config_drift.py fails if the two
+# ever disagree, because verify-clean has to find the bucket after `destroy` has
+# already thrown away the Terraform outputs.
+aws:
+  execution_role_name: LabRole
+  bucket_prefix: prb-cloud-ml-lab1
+
+dataset:
+  seed: 20260817
+  rows: 4000
+  label: churn
+  id_column: observation_id
+  feature_order:
+    - tenure_months
+    - monthly_charges
+    - support_calls_90d
+    - payment_delay_days
+    - usage_score
+    - annual_contract
+    - premium_plan
+  split:
+    train: 0.70
+    validation: 0.15
+    test: 0.15
+
+# Feasible bounds enforced by scripts/validate_data.py. These are contract
+# bounds, not the generator's distribution parameters: a value outside them
+# means the generator or the file drifted.
+bounds:
+  tenure_months: [1, 72]
+  monthly_charges: [20.0, 260.0]
+  support_calls_90d: [0, 30]
+  payment_delay_days: [0.0, 45.0]
+  usage_score: [5.0, 100.0]
+  annual_contract: [0, 1]
+  premium_plan: [0, 1]
+
+# Widened around the ~1/3 the generator actually produces. A run outside this
+# band means the generator changed, and every downstream threshold is suspect.
+prevalence_range: [0.20, 0.50]
+
+min_rows_per_split: 400
+
+acceptance:
+  roc_auc_min: 0.75
+  f1_min: 0.50
+  must_beat_majority_accuracy: true
+  decision_threshold: 0.5
