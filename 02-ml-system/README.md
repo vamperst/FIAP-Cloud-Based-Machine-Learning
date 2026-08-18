@@ -141,10 +141,15 @@ dataset é determinístico por semente: mesma semente, mesmos bytes.
 O toolchain vem de `.devcontainer/`: `postCreate.sh` instala o Terraform 1.15.8 conferindo
 o SHA-256 oficial (que está versionado no script — troca silenciosa do artefato remoto
 quebra o build em vez de passar) e cria o `.venv` com as versões de `requirements.txt`.
-Como o `devcontainer.json` vive **nesta pasta** e não na raiz do repositório, o Codespaces
-não o ativa automaticamente: use *Reopen in Container* apontando para `02-ml-system/`, ou
-rode `bash .devcontainer/postCreate.sh` no ambiente já aberto. Em qualquer caminho,
-`make doctor` é quem confirma se o toolchain está correto.
+No Codespaces, escolha a configuração **Cloud-Based ML — Lab 1 (02-ml-system)** na criação
+do codespace: o Codespaces só lista configurações que estão em `.devcontainer/` na raiz do
+repositório, então existe uma lá que aponta o workspace para esta pasta. Localmente, use
+*Reopen in Container* sobre `02-ml-system/`. Em qualquer caminho, `make doctor` é quem
+confirma se o toolchain está correto.
+
+Os targets chamam `.venv/bin/python` diretamente quando ele existe, em vez de confiar no
+`PATH`: shell de login re-executa `/etc/profile` e descarta o `.venv/bin` que o container
+prepende, o que faria o lab rodar com um interpretador sem `boto3`.
 
 ## O que este lab nunca faz
 
