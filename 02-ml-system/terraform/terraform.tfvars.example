@@ -1,0 +1,22 @@
+# Copy to terraform.tfvars only if you need to override a default. The lab runs
+# end to end with no tfvars file at all.
+#
+# Never put AWS credentials here. Credentials come from the environment or from
+# an AWS profile, and this file is tracked by git.
+
+# region             = "us-east-1"
+# project_prefix     = "prb-cloud-ml-lab1"
+# instance_type      = "ml.m5.large"
+
+# Lower num_round if an Academy run is unnecessarily slow. Keep the model above
+# the acceptance thresholds in config/lab.yaml.
+# hyperparameters = {
+#   objective        = "binary:logistic"
+#   eval_metric      = "auc"
+#   num_round        = "50"
+#   max_depth        = "4"
+#   eta              = "0.10"
+#   subsample        = "0.90"
+#   colsample_bytree = "0.90"
+#   verbosity        = "1"
+# }
