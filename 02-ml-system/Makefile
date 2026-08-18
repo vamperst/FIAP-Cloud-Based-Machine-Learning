@@ -9,7 +9,11 @@ SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 .DEFAULT_GOAL := help
 
-PYTHON ?= python3
+# The venv is preferred over whatever `python3` PATH happens to resolve to: a
+# login shell re-sources /etc/profile and drops the .venv/bin that the
+# devcontainer prepends, which would run the lab against an interpreter without
+# boto3 or pyyaml installed.
+PYTHON ?= $(shell if [ -x .venv/bin/python ]; then echo .venv/bin/python; else echo python3; fi)
 TF ?= terraform
 TF_DIR := terraform
 SCRIPTS := scripts
