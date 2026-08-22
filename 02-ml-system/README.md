@@ -1,11 +1,3 @@
-<!--
-CONVENÇÃO DE PRINTS DESTE README (nota para o professor, não aparece renderizada)
-
-Cada bloco "> 📸 Print NN" abaixo marca o lugar exato onde a imagem entra, com o que
-capturar e o que aquela imagem prova. Depois de salvar o arquivo em `img/`, troque o
-bloco pela linha de imagem que está comentada logo abaixo dele.
--->
-
 # 02 - Do modelo ao sistema de Machine Learning
 
 Antes de começar, o setup do ambiente é o [Lab 01 - Setup e configuração de ambiente](../01-create-codespaces/README.md). Você usa **o mesmo Codespaces e a mesma conta AWS** de todas as aulas: aqui não se cria ambiente novo, apenas se instala o que este laboratório precisa por cima do que já existe.
@@ -103,7 +95,7 @@ flowchart LR
     B1["SageMaker Training Job<br/>1 x ml.m5.large<br/>XGBoost 1.7-1<br/>~150 s faturáveis"]
   end
   subgraph ART["3 - Artefato: durável"]
-    C1["output/.../model.tar.gz<br/>24.208 bytes"]
+    C1["output/.../model.tar.gz<br/>~24 KB"]
   end
   subgraph SER["4 - Serving: computação PERSISTENTE"]
     D1["SageMaker Model"] --> D2["Endpoint Configuration"] --> D3["Endpoint em tempo real<br/>InService"]
@@ -171,7 +163,7 @@ sequenceDiagram
   V->>SM: portão: DescribeTrainingJob em loop
   SM-->>V: Completed, ~150 s faturáveis
   V->>S3: HeadObject no model.tar.gz
-  S3-->>V: existe, 24.208 bytes
+  S3-->>V: existe, ~24 KB
   V->>TF: grava a URI provada em artifact.auto.tfvars.json
   V->>TF: estágio 2 (deploy_serving=true)
   TF->>SM: CreateModel, EndpointConfig, Endpoint
@@ -981,7 +973,7 @@ Três prefixos, três papéis: `input/` é o que o treino leu, `metadata/` é o 
 ### Checkpoint
 
 - [x] `Apply complete! Resources: 9 added` no estágio 1.
-- [x] O portão respondeu `Completed in <N>s billable` (algo entre 140 e 160) e verificou o artefato com `HeadObject`.
+- [x] O portão respondeu `Completed in <N>s billable` (a AWS varia isso a cada execução; qualquer valor abaixo de 200s é normal) e verificou o artefato com `HeadObject`.
 - [x] `Apply complete! Resources: 3 added` no estágio 2.
 - [x] `endpoint_name` aparece nas saídas do Terraform e o endpoint está `InService`.
 - [x] O `model.tar.gz` aparece na listagem do bucket.
@@ -1280,9 +1272,9 @@ São sete seções, e cada uma corresponde a um elo da cadeia. Alguns valores qu
 | 1. Environment | `Git commit` | o commit exato do código que produziu tudo isso |
 | 2. Data | SHA-256 de `source.csv` | começa com `c2a8b771` |
 | 2. Data | `Matches local file` nos dois canais | `True` nos dois |
-| 3. Training | `Billable seconds` | entre `140` e `160` |
+| 3. Training | `Billable seconds` | abaixo de 200 (varia por execução) |
 | 3. Training | `validation:auc` | `0.819570004940033` |
-| 4. Model artifact | `Size (bytes)` e `ETag` | `24208` e `7cc377ee31c04eaec5b3dcad2ff8b1b5` |
+| 4. Model artifact | `Size (bytes)` e `ETag` | preenchidos, mas não compare o número com o de outra execução: o gzip embute timestamp no artefato, então tamanho e ETag mudam a cada `make apply` |
 | 4. Model artifact | `Existence proven by` | `s3:HeadObject before the Model was created` |
 | 5. Serving | `Endpoint status` | `InService` |
 | 6. Evaluation | `Beats baseline` | `True` |
