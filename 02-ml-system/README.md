@@ -94,7 +94,7 @@ flowchart LR
     A2["input/validation/validation.csv<br/>600 linhas"]
   end
   subgraph TRE["2 - Treino: computação FINITA"]
-    B1["SageMaker Training Job<br/>1 x ml.m5.large<br/>XGBoost 1.7-1<br/>~140 s faturáveis"]
+    B1["SageMaker Training Job<br/>1 x ml.m5.large<br/>XGBoost 1.7-1<br/>~150 s faturáveis"]
   end
   subgraph ART["3 - Artefato: durável"]
     C1["output/.../model.tar.gz<br/>24.208 bytes"]
@@ -126,7 +126,7 @@ flowchart LR
 
 Guarde a diferença de cor entre o bloco laranja e o bloco rosa, porque ela é a diferença que aparece na fatura:
 
-- **Treino (laranja)** é computação finita. A instância sobe, treina por 140 segundos, escreve o artefato e é destruída pela própria AWS. Você paga 140 segundos e o gasto termina sozinho.
+- **Treino (laranja)** é computação finita. A instância sobe, treina por cerca de dois minutos e meio, escreve o artefato e é destruída pela própria AWS. Você paga só esse tempo e o gasto termina sozinho.
 - **Serving (rosa)** é computação persistente. A instância sobe e **fica de pé esperando chamadas**, 24 horas por dia, cobrando por hora, mesmo que ninguém chame nada. Ela só para de cobrar quando alguém a destrói. Esse alguém é você, no Passo 25.
 
 > [!CAUTION]
@@ -134,7 +134,7 @@ Guarde a diferença de cor entre o bloco laranja e o bloco rosa, porque ela é a
 >
 > | Recurso | Cobra quando | Ordem de grandeza |
 > |---|---|---|
-> | Training job (`ml.m5.large`) | Só durante os ~140 s de execução | fração de centavo, e termina sozinho |
+> | Training job (`ml.m5.large`) | Só durante os ~150 s de execução | fração de centavo, e termina sozinho |
 > | **Endpoint em tempo real (`ml.m5.large`)** | **Enquanto existir, 24/7, mesmo sem chamada** | **na casa de US$ 0,10 a US$ 0,15 por hora, ou seja, ~US$ 3 por dia e ~US$ 90 por mês** |
 > | S3 (~200 KB de dados) | Armazenamento | centavos por mês |
 >
@@ -163,7 +163,7 @@ sequenceDiagram
   TF->>SM: CreateTrainingJob
   Note over TF,SM: o apply retorna em segundos,<br/>mas o job continua rodando na AWS
   V->>SM: portão: DescribeTrainingJob em loop
-  SM-->>V: Completed, 140 s faturáveis
+  SM-->>V: Completed, ~150 s faturáveis
   V->>S3: HeadObject no model.tar.gz
   S3-->>V: existe, 24.208 bytes
   V->>TF: grava a URI provada em artifact.auto.tfvars.json
@@ -840,8 +840,10 @@ Sem que você digite nada, o `make apply` segue para o portão. Esta é a parte 
 [wait] wrote artifact.auto.tfvars.json for the serving stage
 ```
 
+O número de segundos faturáveis é o único valor dessas linhas que **muda** de execução para execução: ele depende de quanto a AWS demora para provisionar a máquina e baixar o container, e fica na casa de 140 a 160 segundos. Os dois valores de AUC e o tamanho do artefato em bytes, ao contrário, precisam bater **dígito por dígito** com o que está acima e com o da pessoa ao seu lado — é isso que a semente fixa do dataset e as versões pinadas garantem.
+
 > 📸 **Print 08 — `img/08-portao-artefato.png`**
-> Capture do cabeçalho `== gate: ... ==` até a linha `wrote artifact.auto.tfvars.json`. Prova as quatro fases do treino, os 140 segundos cobrados, as duas métricas de AUC e o tamanho exato do artefato conferido com `HeadObject`. É o print mais importante do laboratório.
+> Capture do cabeçalho `== gate: ... ==` até a linha `wrote artifact.auto.tfvars.json`. Prova as quatro fases do treino, os segundos cobrados, as duas métricas de AUC e o tamanho exato do artefato conferido com `HeadObject`. É o print mais importante do laboratório.
 
 <!-- ![](img/08-portao-artefato.png) -->
 
@@ -850,11 +852,11 @@ Cinco fatos que essas linhas estabelecem, e vale conferir cada um na sua tela:
 <dl>
   <dt><b>O treino passou por quatro fases, e uma delas não é treino</b></dt>
   <dd>
-    <code>Starting</code> é a AWS provisionando a máquina. <code>Downloading</code> é o container baixando os dados do S3. Só então vem <code>Training</code>. Ou seja: dos 140 segundos cobrados, uma parte considerável foi passada preparando o ambiente, não ajustando árvores. Em treinos de poucos minutos, essa sobrecarga fixa domina o custo — é um dos motivos pelos quais treinar um modelo pequeno na nuvem raramente vale a pena por velocidade, e vale por reprodutibilidade e rastreabilidade.
+    <code>Starting</code> é a AWS provisionando a máquina. <code>Downloading</code> é o container baixando os dados do S3. Só então vem <code>Training</code>. Ou seja: dos pouco mais de dois minutos cobrados, uma parte considerável foi passada preparando o ambiente, não ajustando árvores. Em treinos de poucos minutos, essa sobrecarga fixa domina o custo — é um dos motivos pelos quais treinar um modelo pequeno na nuvem raramente vale a pena por velocidade, e vale por reprodutibilidade e rastreabilidade.
   </dd>
-  <dt><b>Foram exatamente 140 segundos cobrados, e depois zero</b></dt>
+  <dt><b>Foram pouco mais de dois minutos cobrados, e depois zero</b></dt>
   <dd>
-    A máquina de treino existiu por 140 segundos e foi encerrada pela própria AWS. Você não desligou nada. Compare isso com o que acontece no Passo 14: o endpoint sobe e <b>não</b> se encerra sozinho.
+    A máquina de treino existiu por esses ~150 segundos e foi encerrada pela própria AWS. Você não desligou nada. Compare isso com o que acontece no Passo 14: o endpoint sobe e <b>não</b> se encerra sozinho.
   </dd>
   <dt><b>O modelo aprendeu, e aprendeu diferente em dados que nunca viu</b></dt>
   <dd>
@@ -1059,7 +1061,7 @@ Três prefixos, três papéis: `input/` é o que o treino leu, `metadata/` é o 
 ### Checkpoint
 
 - [x] `Apply complete! Resources: 9 added` no estágio 1.
-- [x] O portão respondeu `Completed in 140s billable` e verificou o artefato com `HeadObject`.
+- [x] O portão respondeu `Completed in <N>s billable` (algo entre 140 e 160) e verificou o artefato com `HeadObject`.
 - [x] `Apply complete! Resources: 3 added` no estágio 2.
 - [x] `endpoint_name` aparece nas saídas do Terraform e o endpoint está `InService`.
 - [x] O `model.tar.gz` aparece na listagem do bucket.
@@ -1376,7 +1378,7 @@ São sete seções, e cada uma corresponde a um elo da cadeia. Alguns valores qu
 | 1. Environment | `Git commit` | o commit exato do código que produziu tudo isso |
 | 2. Data | SHA-256 de `source.csv` | começa com `c2a8b771` |
 | 2. Data | `Matches local file` nos dois canais | `True` nos dois |
-| 3. Training | `Billable seconds` | `140` |
+| 3. Training | `Billable seconds` | entre `140` e `160` |
 | 3. Training | `validation:auc` | `0.819570004940033` |
 | 4. Model artifact | `Size (bytes)` e `ETag` | `24208` e `7cc377ee31c04eaec5b3dcad2ff8b1b5` |
 | 4. Model artifact | `Existence proven by` | `s3:HeadObject before the Model was created` |
@@ -1625,7 +1627,7 @@ Este comando é a forma como o laboratório é validado antes de chegar até voc
 
 Você começou com uma pergunta de negócio e terminou com um sistema que responde a ela.
 
-Entre uma coisa e outra, cinco capacidades foram encadeadas, e cada elo foi verificado antes de o próximo existir: os dados passaram por 48 verificações antes de subir; o treino rodou por 140 segundos cobrados e produziu um artefato de 24 KB; a existência desse artefato foi provada com `HeadObject` **antes** de o modelo ser criado; o endpoint subiu em 3m30s e respondeu `0.964739` para o cliente de risco alto; e os 600 clientes que o modelo nunca viu mostraram um ganho de 10 pontos de acurácia sobre chutar a classe majoritária.
+Entre uma coisa e outra, cinco capacidades foram encadeadas, e cada elo foi verificado antes de o próximo existir: os dados passaram por 48 verificações antes de subir; o treino rodou por pouco mais de dois minutos cobrados e produziu um artefato de 24 KB; a existência desse artefato foi provada com `HeadObject` **antes** de o modelo ser criado; o endpoint subiu em 3m30s e respondeu `0.964739` para o cliente de risco alto; e os 600 clientes que o modelo nunca viu mostraram um ganho de 10 pontos de acurácia sobre chutar a classe majoritária.
 
 Três ideias sobrevivem ao laboratório:
 
