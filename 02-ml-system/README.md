@@ -201,10 +201,7 @@ git pull origin master
 cd 02-ml-system
 ```
 
-> 📸 **Print 01 — `img/01-codespaces-existente.png`**
-> Capture a lista em `github.com/codespaces` com o ambiente da disciplina destacado (estado `Running` ou `Stopped`). Prova que o laboratório começa reabrindo o ambiente que já existe, e não criando outro — que é o erro número um desta parte.
-
-<!-- ![](img/01-codespaces-existente.png) -->
+![](img/01-codespaces-existente.png)
 
 <details>
 <summary><b>💡 Clique para entender: por que um Codespaces só para toda a disciplina</b></summary>
@@ -254,12 +251,9 @@ Saída esperada (leva de 40 a 90 segundos na primeira vez):
 ==> pronto. Próximo passo: make doctor
 ```
 
-A linha do AWS CLI termina com a arquitetura da máquina e a versão do kernel, então ela muda de ambiente para ambiente (`x86_64` no Codespaces, `aarch64` em Mac com Apple Silicon). As duas linhas que precisam bater são `Terraform v1.15.8` e `Python 3.12` — a versão de patch do Python pode variar dentro da série.
 
-> 📸 **Print 02 — `img/02-setup-do-lab.png`**
-> Capture o terminal com a saída completa de `bash scripts/setup.sh`, das primeiras linhas até `pronto. Próximo passo: make doctor`. Prova as três versões que o laboratório exige — Terraform 1.15.8, Python 3.12 e AWS CLI — vindas do próprio ambiente do aluno.
 
-<!-- ![](img/02-setup-do-lab.png) -->
+![](img/02-setup-do-lab.png)
 
 <details>
 <summary><b>💡 Clique para entender: o que o script instala e por que ele é seguro rodar de novo</b></summary>
@@ -305,42 +299,6 @@ Se o `terraform` continuar ausente, seu Codespaces é anterior à configuração
 
 ---
 
-<a id="passo-3"></a>
-
-**3. Copie as credenciais do Learner Lab para dentro do Codespaces**
-
-As credenciais do Learner Lab valem **4 horas**. As que você colou na aula passada certamente expiraram, então o ritual é sempre o mesmo: sessão nova no Academy, credencial nova no Codespaces. Abra o arquivo de credenciais:
-
-```bash
-code ~/.aws/credentials
-```
-
-Na aba do AWS Academy, com o laboratório iniciado (bolinha verde), clique em `AWS Details` no canto superior direito e depois em `Show` na seção `AWS CLI`. Copie o bloco inteiro, cole no arquivo aberto no Codespaces e salve com `Ctrl+S` (ou `Cmd+S`).
-
-> 📸 **Print 03 — `img/03-credenciais-coladas.png`**
-> Capture o arquivo `~/.aws/credentials` aberto no editor do Codespaces com o bloco colado, **cobrindo ou desfocando os valores de `aws_access_key_id`, `aws_secret_access_key` e `aws_session_token`**. Prova onde o arquivo fica e qual é o formato esperado, sem expor credencial em material didático.
-
-<!-- ![](img/03-credenciais-coladas.png) -->
-
-> [!IMPORTANT]
-> **A credencial do Academy vale 4 horas.** Ao voltar ao laboratório em outro dia, ou depois de um `End Lab`, repita este passo. Sinal típico de credencial vencida: qualquer comando da AWS responder `ExpiredToken` ou `InvalidClientTokenId`. Nenhum script deste lab imprime chave, segredo ou token em tela, então a única cópia visível é a que você acabou de colar.
-
----
-
-<a id="passo-4"></a>
-
-**4. Confirme que a credencial responde**
-
-```bash
-aws sts get-caller-identity
-```
-
-Saída esperada: um JSON com `UserId`, `Account` (o número de 12 dígitos da sua conta do Learner Lab) e `Arn` terminando em `assumed-role/voclabs/user...`.
-
-Este é o primeiro **go/no-go** do laboratório: se este comando falhar, nada adiante funciona. Volte ao Passo 3.
-
----
-
 <a id="passo-5"></a>
 
 **5. Conheça a superfície de comandos do laboratório**
@@ -383,7 +341,6 @@ São 14 comandos, e é a lista inteira do laboratório. Nada acontece por baixo 
 **6. Rode o portão de entrada**
 
 ```bash
-cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
 make doctor
 ```
 
@@ -406,10 +363,7 @@ AWS preflight
 [PASS] preflight
 ```
 
-> 📸 **Print 04 — `img/04-make-doctor.png`**
-> Capture o terminal desde `== tool versions ==` até `[PASS] preflight`, com o número da conta visível. Prova que o toolchain está na versão pinada, que a credencial responde, que a região é `us-east-1` e que a `LabRole` existe. É a foto do único portão que separa o aluno de gastar dinheiro em ambiente errado.
-
-<!-- ![](img/04-make-doctor.png) -->
+![](img/04-make-doctor.png)
 
 <details>
 <summary><b>💡 Clique para entender: o que o portão verifica e por que ele existe antes de tudo</b></summary>
@@ -437,7 +391,6 @@ O seu arquivo de configuração da AWS está apontando para outra região. Force
 
 ```bash
 aws configure set region us-east-1
-cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
 make doctor
 ```
 
@@ -498,12 +451,7 @@ Saída esperada, literalmente igual à sua (com exceção do caminho, que traz o
 [data] written to /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system/artifacts/data
 ```
 
-> 📸 **Print 05 — `img/05-make-data.png`**
-> Capture as sete linhas acima, com os três prefixos de hash (`2013b9725797`, `18a0ddc5d4d8`, `04c4fdee573f`) legíveis. Prova que o dataset é reprodutível e serve de referência para o aluno comparar com o colega.
-
-<!-- ![](img/05-make-data.png) -->
-
-**Compare com um colega agora.** Os três prefixos de hash e as três prevalências precisam ser idênticos aos dele. Se divergirem, alguém alterou o gerador ou a configuração, e todas as métricas do resto do laboratório vão divergir também.
+![](img/05-make-data.png)
 
 <details>
 <summary><b>💡 Clique para entender: o que são esses 4.000 clientes e por que eles não são reais</b></summary>
@@ -536,7 +484,6 @@ A relação entre as características e o cancelamento foi construída para ser 
 **8. Olhe os arquivos que foram gerados**
 
 ```bash
-cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
 ls -la artifacts/data
 ```
 
@@ -637,10 +584,7 @@ data contract: 48 checks against /workspaces/FIAP-Cloud-Based-Machine-Learning/0
 [PASS] 0 of 48 checks failed
 ```
 
-> 📸 **Print 06 — `img/06-contrato-48-checks.png`**
-> Capture o final da saída, com a linha `[PASS] 0 of 48 checks failed` e ao menos as três verificações de `schema.*` visíveis. Prova que o contrato é executável e que ele conhece a diferença entre o formato de treino (8 colunas, rótulo primeiro) e o de serving (7 colunas, sem rótulo).
-
-<!-- ![](img/06-contrato-48-checks.png) -->
+![](img/06-contrato-48-checks.png)
 
 Repare no redirecionamento `> artifacts/contrato.json`: a narração que você vê na tela é o canal de diagnóstico, e o **resultado** do contrato é um JSON que ficou no arquivo. Todo script deste laboratório segue essa convenção, o que permite encadear qualquer um deles em automação sem parsear texto de log.
 
@@ -777,10 +721,7 @@ aws_sagemaker_training_job.churn: Creation complete after 1s
 Apply complete! Resources: 9 added, 0 changed, 0 destroyed.
 ```
 
-> 📸 **Print 07 — `img/07-apply-stage1.png`**
-> Capture do cabeçalho `== stage 1/2: storage and training job ==` até a linha `Apply complete! Resources: 9 added, 0 changed, 0 destroyed.`. Prova que o armazenamento e o training job foram criados, e que nenhum recurso de serving entrou neste estágio.
-
-<!-- ![](img/07-apply-stage1.png) -->
+![](img/07-apply-stage1.png)
 
 Repare em `aws_sagemaker_training_job.churn: Creation complete after 1s`. O Terraform criou o job em 1 segundo, mas o treino **não** terminou em 1 segundo. O que terminou foi a **submissão**: o Terraform pediu à AWS "comece a treinar" e a AWS respondeu "aceito". O treino roda de forma assíncrona, e é isso que o próximo passo resolve.
 
@@ -817,67 +758,6 @@ aws s3 rb "s3://$BUCKET"
 
 </blockquote>
 </details>
-
----
-
-<a id="passo-13"></a>
-
-**13. Leia o portão: o momento em que o modelo se torna um artefato**
-
-Sem que você digite nada, o `make apply` segue para o portão. Esta é a parte mais importante do laboratório inteiro:
-
-```text
-== gate: wait for the training job and prove the artifact exists ==
-[wait] waiting for training job prb-cloud-ml-lab1-train-a1b2c3d4
-[training] prb-cloud-ml-lab1-train-a1b2c3d4: InProgress / Starting
-[training] prb-cloud-ml-lab1-train-a1b2c3d4: InProgress / Downloading
-[training] prb-cloud-ml-lab1-train-a1b2c3d4: InProgress / Training
-[training] prb-cloud-ml-lab1-train-a1b2c3d4: Completed / Completed
-[wait] Completed in 140s billable
-[wait] final metric validation:auc=0.819570004940033
-[wait] final metric train:auc=0.8836299777030945
-[wait] artifact s3://prb-cloud-ml-lab1-123456789012/output/training/prb-cloud-ml-lab1-train-a1b2c3d4/output/model.tar.gz (24208 bytes, verified with HeadObject)
-[wait] wrote artifact.auto.tfvars.json for the serving stage
-```
-
-O número de segundos faturáveis é o único valor dessas linhas que **muda** de execução para execução: ele depende de quanto a AWS demora para provisionar a máquina e baixar o container, e fica na casa de 140 a 160 segundos. Os dois valores de AUC e o tamanho do artefato em bytes, ao contrário, precisam bater **dígito por dígito** com o que está acima e com o da pessoa ao seu lado — é isso que a semente fixa do dataset e as versões pinadas garantem.
-
-> 📸 **Print 08 — `img/08-portao-artefato.png`**
-> Capture do cabeçalho `== gate: ... ==` até a linha `wrote artifact.auto.tfvars.json`. Prova as quatro fases do treino, os segundos cobrados, as duas métricas de AUC e o tamanho exato do artefato conferido com `HeadObject`. É o print mais importante do laboratório.
-
-<!-- ![](img/08-portao-artefato.png) -->
-
-Cinco fatos que essas linhas estabelecem, e vale conferir cada um na sua tela:
-
-<dl>
-  <dt><b>O treino passou por quatro fases, e uma delas não é treino</b></dt>
-  <dd>
-    <code>Starting</code> é a AWS provisionando a máquina. <code>Downloading</code> é o container baixando os dados do S3. Só então vem <code>Training</code>. Ou seja: dos pouco mais de dois minutos cobrados, uma parte considerável foi passada preparando o ambiente, não ajustando árvores. Em treinos de poucos minutos, essa sobrecarga fixa domina o custo — é um dos motivos pelos quais treinar um modelo pequeno na nuvem raramente vale a pena por velocidade, e vale por reprodutibilidade e rastreabilidade.
-  </dd>
-  <dt><b>Foram pouco mais de dois minutos cobrados, e depois zero</b></dt>
-  <dd>
-    A máquina de treino existiu por esses ~150 segundos e foi encerrada pela própria AWS. Você não desligou nada. Compare isso com o que acontece no Passo 14: o endpoint sobe e <b>não</b> se encerra sozinho.
-  </dd>
-  <dt><b>O modelo aprendeu, e aprendeu diferente em dados que nunca viu</b></dt>
-  <dd>
-    <code>train:auc=0.8836</code> contra <code>validation:auc=0.8196</code>. A diferença de ~6 pontos entre treino e validação é o modelo se ajustando um pouco mais aos dados que ele viu do que aos que não viu. Isso é esperado e saudável nessa magnitude. Se a validação estivesse em 0,55 com o treino em 0,99, você estaria olhando um caso claro de sobreajuste.
-  </dd>
-  <dt><b>O artefato existe, e isso foi verificado, não presumido</b></dt>
-  <dd>
-    <code>24208 bytes, verified with HeadObject</code>. O portão não confia no status <code>Completed</code>: ele lê o caminho do artefato via <code>DescribeTrainingJob</code> e depois pergunta ao S3 se aquele objeto realmente está lá, com aquele tamanho. Um modelo treinado que ninguém consegue carregar não serve para nada. Repare no tamanho: <b>24 KB</b>. O modelo que vai atender a diretora de receita é menor que uma foto de celular. O valor não está no tamanho do arquivo, está no fato de ele ser um artefato durável e endereçável.
-  </dd>
-  <dt><b>Um arquivo foi escrito para o próximo estágio</b></dt>
-  <dd>
-    <code>artifact.auto.tfvars.json</code> é o bilhete que o portão deixa para o Terraform: "o artefato está neste URI, agora você pode criar o modelo". É a materialização do encadeamento entre os dois estágios.
-  </dd>
-</dl>
-
-Se quiser ver o bilhete:
-
-```bash
-cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
-cat terraform/artifact.auto.tfvars.json
-```
 
 ---
 
@@ -973,10 +853,7 @@ training_job_name = "prb-cloud-ml-lab1-train-a1b2c3d4"
 training_output_uri = "s3://prb-cloud-ml-lab1-123456789012/output/training/"
 ```
 
-> 📸 **Print 09 — `img/09-terraform-outputs.png`**
-> Capture o bloco `Outputs:` inteiro, com `deploy_serving = true`, `endpoint_name`, `model_artifact_uri` e os hiperparâmetros visíveis. Prova o inventário do sistema e serve de referência para o aluno voltar depois, quando precisar do nome do endpoint.
-
-<!-- ![](img/09-terraform-outputs.png) -->
+![](img/09-terraform-outputs.png)
 
 Três observações sobre o que **não** está aqui:
 
@@ -990,17 +867,11 @@ Três observações sobre o que **não** está aqui:
 
 **16. Confirme o training job no console da AWS**
 
-Vale ver com os próprios olhos que o que você criou por código está no console. Na aba do AWS Academy, clique em `AWS` (botão que abre o console) e navegue para **Amazon SageMaker AI** → menu lateral `Training` → `Training jobs`.
+Para ver o que o Terraform criou, abra o console do SageMaker e vá em [Training jobs](https://us-east-1.console.aws.amazon.com/sagemaker/home?region=us-east-1#/training).
 
-Você deve ver um job com o nome que apareceu na saída (`prb-cloud-ml-lab1-train-...`), com `Status: Completed`. Clique nele e observe duas seções:
+Você deve ver um job com o nome que apareceu na saída (`prb-cloud-ml-lab1-train-...`), com `Status: Completed`. Clique nele e observe duas seções.
 
-- **Monitor**, com o tempo de execução e as métricas `train:auc` e `validation:auc` — os mesmos números do Passo 13.
-- **Output**, com o caminho S3 do `model.tar.gz`.
-
-> 📸 **Print 10 — `img/10-console-training-job.png`**
-> Capture a página de detalhe do training job, mostrando `Status: Completed` e a seção com as métricas. Prova que o recurso criado por Terraform é o mesmo que o console mostra, e conecta a linha de log ao objeto real na AWS.
-
-<!-- ![](img/10-console-training-job.png) -->
+![](img/10-console-training-job.png)
 
 <details>
 <summary><b>⚠ Se der erro: <code>AccessDenied</code> ou a página do SageMaker não abre no Learner Lab</b></summary>
@@ -1026,14 +897,13 @@ Nesse caso, capture o Print 10 a partir da saída deste comando no terminal.
 
 **17. Confirme o endpoint e o bucket**
 
-No console do SageMaker, vá em `Inference` → `Endpoints`. O endpoint deve estar com `Status: InService`.
+Clique no link do console do SageMaker para ver os endpoints: [Endpoints](https://us-east-1.console.aws.amazon.com/sagemaker/home?region=us-east-1#/endpoints).
 
-> 📸 **Print 11 — `img/11-console-endpoint-inservice.png`**
-> Capture a lista (ou o detalhe) do endpoint com `Status: InService` e o tipo de instância `ml.m5.large` visível. Prova que existe um serviço vivo, e é a imagem que ancora a conversa de custo: a partir deste estado, a conta é cobrada por hora.
+![](img/11-console-endpoint-inservice.png)
 
-<!-- ![](img/11-console-endpoint-inservice.png) -->
+![](img/11-console-endpoint-inservice2.png)
 
-Agora olhe a organização do bucket, que conta a história do fluxo de dados:
+Devolta ao codespaces. No terminal, execute os comandos abaixo que mostram a organização do bucket, que conta a história do fluxo de dados:
 
 ```bash
 cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
@@ -1050,11 +920,7 @@ metadata/dataset_manifest.json
 metadata/schema.json
 output/training/prb-cloud-ml-lab1-train-a1b2c3d4/output/model.tar.gz
 ```
-
-> 📸 **Print 12 — `img/12-bucket-layout.png`**
-> Capture esta listagem, com os três prefixos (`input/`, `metadata/`, `output/`) visíveis e o `model.tar.gz` no fim. Prova que a entrada, os metadados e a saída do treino são separados, e mostra o artefato como objeto real no armazenamento.
-
-<!-- ![](img/12-bucket-layout.png) -->
+![](img/12-bucket-layout.png)
 
 Três prefixos, três papéis: `input/` é o que o treino leu, `metadata/` é o que descreve o dataset (manifesto com as impressões digitais e o esquema), e `output/` é o que o treino produziu. O `model.tar.gz` que está ali é o **mesmo** objeto que o endpoint carregou em memória no Passo 14.
 
@@ -1100,10 +966,7 @@ Saída esperada, com os números iguais aos seus:
 [PASS] smoke inference
 ```
 
-> 📸 **Print 13 — `img/13-make-predict.png`**
-> Capture a saída inteira, com as duas requisições, as duas probabilidades (`0.964739` e `0.017099`) e as quatro verificações em `[PASS]`. Prova que existe um serviço respondendo a chamada e que a resposta é uma probabilidade, não um rótulo.
-
-<!-- ![](img/13-make-predict.png) -->
+![](img/13-make-predict.png)
 
 **Este é o momento em que a pergunta da Helena passa a ter resposta.** Ela perguntou "dado um cliente, qual é a probabilidade de ele cancelar?". A resposta é `0.964739`, entregue por um endpoint HTTPS que qualquer sistema autorizado pode chamar.
 
@@ -1158,7 +1021,7 @@ Se responder `Creating`, aguarde e tente de novo. Se responder `Failed`, rode `m
 
 **19. Pontue os 600 clientes que o modelo nunca viu**
 
-Duas chamadas provam que o serviço responde. Elas não dizem se ele responde **bem**. Para isso existe o conjunto de teste, que ficou guardado desde o Passo 7 e nunca chegou perto do treino:
+Duas cehamadas provam qu o serviço responde. Elas não dizem se ele responde **bem**. Para isso existe o conjunto de teste, que ficou guardado desde o Passo 7 e nunca chegou perto do treino:
 
 ```bash
 cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
@@ -1183,12 +1046,7 @@ Saída esperada:
 [evaluate] wrote .../artifacts/evidence/evaluation.json and evaluation.md
 ```
 
-> 📸 **Print 14 — `img/14-make-evaluate.png`**
-> Capture a saída inteira, com os três lotes, as métricas e os quatro `[PASS]`. Prova que o modelo foi avaliado em dados que nunca viu, que ele bate o baseline e que as métricas do laboratório conferem com o scikit-learn.
-
-<!-- ![](img/14-make-evaluate.png) -->
-
-**Compare com um colega.** Todos os números aqui precisam ser idênticos aos dele, até a quarta casa decimal. É a semente fixa do dataset trabalhando: se `accuracy 0.7617` divergir, algo divergiu antes.
+![](img/14-make-evaluate.png)
 
 Repare em `batch 1/2/3`: as 600 linhas não vão em uma chamada só, e sim em lotes de até 250. Isso não é limitação do laboratório, é como se conversa com um endpoint de tempo real — cada requisição tem limite de tamanho, e enviar de uma vez seria pedir para receber um erro de payload.
 
@@ -1283,10 +1141,6 @@ Calibração é o que permite usar a probabilidade como número, e não só como
 
 **Geral: PASS**
 
-> 📸 **Print 15 — `img/15-evaluation-md.png`**
-> Capture o `evaluation.md` aberto no editor, mostrando a tabela de baseline e a tabela de aceitação com `Overall: PASS`. Prova que os critérios de aprovação estavam definidos em configuração antes do resultado, e que o veredito é uma consequência deles.
-
-<!-- ![](img/15-evaluation-md.png) -->
 
 Os três limiares vivem em `config/lab.yaml` e foram escritos **antes** de qualquer treino. Isso é o oposto do que costuma acontecer: treinar, ver que deu 0,81, e então declarar que 0,80 era a meta. Critério definido depois do resultado não é critério, é justificativa.
 
@@ -1351,10 +1205,7 @@ Saída esperada:
 
 Sete elos, sete verificações. Nenhuma delas lê um log ou confia em memória: cada uma consulta a AWS ou recalcula o valor.
 
-> 📸 **Print 16 — `img/16-make-evidence.png`**
-> Capture as oito linhas, com os sete `[PASS]` e o caminho do `evidence.md`. Prova que a cadeia inteira, do armazenamento à evidência, foi verificada de forma independente e no mesmo ciclo.
-
-<!-- ![](img/16-make-evidence.png) -->
+![](img/16-make-evidence.png)
 
 ---
 
@@ -1471,7 +1322,7 @@ Zero recursos cobrando na sua conta, provado por comando e não por confiança.
 <a id="passo-25"></a>
 
 **25. Destrua tudo**
-
+Devolta ao code spaces. No terminal, rode:
 ```bash
 cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
 make destroy
@@ -1485,10 +1336,7 @@ Destroy complete! Resources: 12 destroyed.
 
 Doze recursos: os nove do estágio 1 mais os três do estágio 2. O Terraform destrói na ordem inversa da criação, então o endpoint sai antes do bucket.
 
-> 📸 **Print 17 — `img/17-make-destroy.png`**
-> Capture a linha `Destroy complete! Resources: 12 destroyed.`. Prova que os doze recursos criados foram removidos no mesmo ciclo.
-
-<!-- ![](img/17-make-destroy.png) -->
+![](img/17-make-destroy.png)
 
 <details>
 <summary><b>⚠ Se der erro: o destroy falha porque o bucket não está vazio</b></summary>
@@ -1538,10 +1386,7 @@ Saída esperada:
 [PASS] verify-clean
 ```
 
-> 📸 **Print 18 — `img/18-verify-clean.png`**
-> Capture as cinco linhas, com os quatro `[PASS]` e o `[PASS] verify-clean`. Prova, consultando a AWS diretamente, que nenhum recurso cobrável do laboratório sobrou. É o print que fecha o ciclo de custo.
-
-<!-- ![](img/18-verify-clean.png) -->
+![](img/18-verify-clean.png)
 
 <details>
 <summary><b>💡 Clique para entender: por que verificar depois de destruir</b></summary>
@@ -1571,22 +1416,10 @@ Remove `artifacts/` e os caches do Python. **Nunca toca na AWS.** Só rode se vo
 
 ---
 
-<a id="passo-28"></a>
-
-**28. Desligue o Codespaces**
-
-O Codespaces também consome cota (de horas do GitHub, não do crédito AWS). Na aba do repositório: `Code` → `Codespaces` → três pontos ao lado do seu Codespace → `Stop codespace`.
-
-Ele preserva o disco, então você volta depois com tudo no lugar. A credencial da AWS, porém, terá vencido: reveja o Passo 3 ao retomar.
-
-> [!CAUTION]
-> **Pare, não apague.** Este é o Codespaces de toda a disciplina, inclusive do trabalho final. `Stop codespace` zera o consumo de horas e mantém o ambiente; `Delete` obrigaria você a repetir o Lab 01 do zero na próxima aula.
-
 ### Checkpoint
 
 - [x] `Destroy complete! Resources: 12 destroyed.`
 - [x] `make verify-clean` responde `[PASS] verify-clean` com os quatro itens.
-- [x] Codespaces parado.
 
 **Zero recursos cobrando.** O laboratório terminou com a conta no mesmo estado em que começou.
 
@@ -1596,7 +1429,7 @@ Ele preserva o disco, então você volta depois com tudo no lugar. A credencial 
 
 <a id="passo-29"></a>
 
-**29. Repita tudo com um comando**
+**29. **Opcional** Repita tudo com um comando**
 
 Agora que você executou cada etapa entendendo o que ela faz, vale ver o ciclo completo rodando de uma vez:
 
