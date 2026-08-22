@@ -8,14 +8,14 @@ bloco pela linha de imagem que está comentada logo abaixo dele.
 
 # 02 - Do modelo ao sistema de Machine Learning
 
-Antes de começar, o setup do ambiente é o [Lab 01 - Preparando o Codespaces e as credenciais](../01-create-codespaces/README.md).
+Antes de começar, o setup do ambiente é o [Lab 01 - Setup e configuração de ambiente](../01-create-codespaces/README.md). Você usa **o mesmo Codespaces e a mesma conta AWS** de todas as aulas: aqui não se cria ambiente novo, apenas se instala o que este laboratório precisa por cima do que já existe.
 
 Todos os comandos deste laboratório rodam **no terminal do Codespaces**. Não existe passo obrigatório de clicar no console da AWS: o console aparece duas vezes, só para você ver com os próprios olhos que o recurso que o Terraform criou existe de verdade.
 
 > [!WARNING]
 > **Pré-requisitos. Confira estes quatro itens antes de continuar:**
 >
-> - [ ] Lab 01 concluído (fork do repositório, Codespaces criado, bucket `base-config-<SEU_RM>` no S3).
+> - [ ] Lab 01 concluído (fork do repositório, Codespaces da disciplina criado, bucket `base-config-<SEU_RM>` no S3).
 > - [ ] Sessão do AWS Academy Learner Lab **iniciada** (bolinha verde ao lado de "AWS").
 > - [ ] Credenciais do Academy copiadas para `~/.aws/credentials` dentro do Codespaces. Elas expiram a cada 4 horas.
 > - [ ] Crédito disponível no Learner Lab (este lab consome centavos de dólar; o risco real é esquecer o endpoint ligado).
@@ -44,7 +44,7 @@ Um endpoint SageMaker em tempo real servindo um XGBoost treinado na sua própria
 
 | Parte | O que você faz | Passos | Tempo |
 |---|---|---|---|
-| [Parte 1 - Ambiente e credenciais](#parte-1---ambiente-e-credenciais) | Abre o Codespaces do lab, renova a credencial do Academy e roda o portão de entrada. | [1](#passo-1) · [2](#passo-2) · [3](#passo-3) · [4](#passo-4) · [5](#passo-5) · [6](#passo-6) | ~15 min |
+| [Parte 1 - Ambiente e credenciais](#parte-1---ambiente-e-credenciais) | Reabre o Codespaces da disciplina, instala o que é específico do lab, renova a credencial do Academy e roda o portão de entrada. | [1](#passo-1) · [2](#passo-2) · [3](#passo-3) · [4](#passo-4) · [5](#passo-5) · [6](#passo-6) | ~15 min |
 | [Parte 2 - Dados e contrato](#parte-2---dados-e-contrato) | Gera o dataset, inspeciona os arquivos e roda o contrato de dados. Quebra o contrato de propósito. | [7](#passo-7) · [8](#passo-8) · [9](#passo-9) · [10](#passo-10) | ~15 min |
 | [Parte 3 - Provisionamento, treino e serving](#parte-3---provisionamento-treino-e-serving) | Sobe armazenamento, treino, artefato e serving com um comando, em dois estágios. | [11](#passo-11) · [12](#passo-12) · [13](#passo-13) · [14](#passo-14) · [15](#passo-15) · [16](#passo-16) · [17](#passo-17) | ~20 min |
 | [Parte 4 - Chamando o modelo e medindo o que ele vale](#parte-4---chamando-o-modelo-e-medindo-o-que-ele-vale) | Chama o endpoint com dois registros, depois com as 600 linhas de teste, e lê as métricas. | [18](#passo-18) · [19](#passo-19) · [20](#passo-20) · [21](#passo-21) | ~15 min |
@@ -183,58 +183,50 @@ Os passos 6 e 7 dessa sequência são o coração do lab: entre "o treino termin
 
 ### Resultado esperado desta parte
 
-`make doctor` respondendo `[PASS] preflight` dentro do Codespaces, com Terraform 1.15.8, Python 3.12, a conta do Learner Lab identificada, a região `us-east-1` confirmada e a `LabRole` encontrada.
+`make doctor` respondendo `[PASS] preflight` dentro do Codespaces da disciplina, com Terraform 1.15.8, Python 3.12, a conta do Learner Lab identificada, a região `us-east-1` confirmada e a `LabRole` encontrada.
 
 > Vamos gastar 15 minutos garantindo que o ambiente está certo antes de tocar na AWS. Todo erro deste laboratório é mais barato de descobrir aqui do que depois de criar um endpoint.
 
 <a id="passo-1"></a>
 
-**1. Crie o Codespaces com a configuração deste laboratório**
+**1. Reabra o Codespaces da disciplina e entre na pasta do laboratório**
 
-No **seu fork** do repositório, no GitHub: botão verde `Code` → aba `Codespaces` → clique nos três pontos (`...`) → `New with options...`.
+Você não cria Codespaces novo neste lab. Abra [github.com/codespaces](https://github.com/codespaces) e clique no ambiente que você criou no Lab 01, derivado do **seu fork** de `FIAP-Cloud-Based-Machine-Learning`. Se ele estiver `Stopped`, o próprio clique o religa — leva cerca de 30 segundos.
 
-No campo **Dev container configuration**, escolha:
+Com o terminal aberto, puxe a versão mais recente do repositório e entre na pasta deste laboratório:
 
-```text
-Cloud-Based ML — Lab 1 (02-ml-system)
+```bash
+cd /workspaces/FIAP-Cloud-Based-Machine-Learning
+git pull origin master
+cd 02-ml-system
 ```
 
-Confirme com `Create codespace`. A construção leva de 3 a 5 minutos, porque o container instala o Terraform e monta o ambiente Python do lab.
+> 📸 **Print 01 — `img/01-codespaces-existente.png`**
+> Capture a lista em `github.com/codespaces` com o ambiente da disciplina destacado (estado `Running` ou `Stopped`). Prova que o laboratório começa reabrindo o ambiente que já existe, e não criando outro — que é o erro número um desta parte.
 
-> 📸 **Print 01 — `img/01-devcontainer-config.png`**
-> Capture o diálogo `New with options...` com o campo **Dev container configuration** aberto, mostrando a opção `Cloud-Based ML — Lab 1 (02-ml-system)` selecionada. Prova que o aluno escolheu a configuração certa, que é o erro número um desta parte.
-
-<!-- ![](img/01-devcontainer-config.png) -->
+<!-- ![](img/01-codespaces-existente.png) -->
 
 <details>
-<summary><b>💡 Clique para entender: por que este lab pede um Codespaces novo em vez de reusar o do Lab 01</b></summary>
+<summary><b>💡 Clique para entender: por que um Codespaces só para toda a disciplina</b></summary>
 <blockquote>
 
-O Codespaces só oferece as configurações de container que estão em `.devcontainer/` **na raiz** do repositório. Como este laboratório precisa de um toolchain específico (Terraform 1.15.8 exato, Python 3.12 com as bibliotecas em versões pinadas), existe uma configuração dedicada na raiz que aponta o workspace para a pasta `02-ml-system`.
+Construir um Codespaces do zero custa de 10 a 15 minutos, porque o ambiente baixa a imagem Ubuntu, aplica as ferramentas e roda o script de pós-criação. Se cada laboratório tivesse o seu, a turma gastaria esse tempo em toda aula — e uma parte dela ficaria travada em problemas de criação em vez de arquitetura de ML.
 
-O que essa configuração faz por você, sem nenhum comando manual:
+O desenho da disciplina separa duas camadas:
 
-1. Instala o Terraform **1.15.8**, conferindo o SHA-256 oficial do binário. Se a AWS ou a HashiCorp trocarem o artefato remoto, a construção falha em vez de instalar algo diferente do que a aula validou.
-2. Cria um ambiente virtual Python em `.venv` com as versões exatas de `requirements.txt` (boto3, numpy, scikit-learn, PyYAML).
-3. Instala o AWS CLI.
+1. **O ambiente base**, definido em [`.devcontainer/`](../.devcontainer/README.md) na raiz do repositório, criado uma única vez no Lab 01: Ubuntu 24.04, Python 3.12, AWS CLI, Terraform 1.15.8, Node LTS, Docker e `make`.
+2. **O específico de cada lab**, instalado por um script dentro do ambiente que já existe — o Passo 2 aqui.
 
-Versão pinada não é preciosismo: é o que faz o número que aparece na sua tela ser o mesmo que aparece na tela do colega ao lado.
+O efeito colateral bom é que o que você fez em aulas anteriores continua no disco: os artefatos, o histórico do terminal e os arquivos que você editou estão todos lá quando você reabre.
 
 </blockquote>
 </details>
 
 <details>
-<summary><b>⚠ Se você quer reaproveitar o Codespaces do Lab 01</b></summary>
+<summary><b>⚠ Se der erro no <code>git pull</code>: <code>Your local changes would be overwritten by merge</code></b></summary>
 <blockquote>
 
-O caminho suportado é criar um Codespaces novo com a configuração acima. Se por algum motivo você precisar continuar no ambiente do Lab 01, instale o toolchain à mão antes de qualquer outro passo:
-
-```bash
-cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
-bash .devcontainer/postCreate.sh
-```
-
-O script é idempotente: se o Terraform já estiver na versão certa, ele apenas informa e segue. Ao terminar, continue do Passo 2.
+Você tem alterações locais de um lab anterior. Se quiser preservá-las, use `git stash`, depois `git pull origin master`, depois `git stash pop`. Se for lixo de exercício antigo, descarte com `git checkout .` antes do pull.
 
 </blockquote>
 </details>
@@ -243,12 +235,55 @@ O script é idempotente: se o Terraform já estiver na versão certa, ele apenas
 
 <a id="passo-2"></a>
 
-**2. Confirme que o container terminou de construir**
+**2. Instale o que este laboratório precisa, dentro do Codespaces**
 
-Quando o Codespaces abrir, o terminal já começa dentro da pasta do laboratório. Confirme o toolchain:
+O ambiente base já tem Terraform, AWS CLI, Python e `make`. Falta o que é exclusivo deste lab: o ambiente virtual Python com as bibliotecas nas versões exatas que a aula validou. Um script faz isso:
 
 ```bash
-cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
+bash scripts/setup.sh
+```
+
+Saída esperada (leva de 40 a 90 segundos na primeira vez):
+
+```text
+==> terraform 1.15.8 já disponível
+==> criando .venv com as versões de requirements.txt
+==> terraform : Terraform v1.15.8
+==> python    : Python 3.12.14
+==> aws cli   : aws-cli/2.36.29 Python/3.14.6 Linux/6.12.76-linuxkit exe/aarch64.ubuntu.24
+==> pronto. Próximo passo: make doctor
+```
+
+A linha do AWS CLI termina com a arquitetura da máquina e a versão do kernel, então ela muda de ambiente para ambiente (`x86_64` no Codespaces, `aarch64` em Mac com Apple Silicon). As duas linhas que precisam bater são `Terraform v1.15.8` e `Python 3.12` — a versão de patch do Python pode variar dentro da série.
+
+> 📸 **Print 02 — `img/02-setup-do-lab.png`**
+> Capture o terminal com a saída completa de `bash scripts/setup.sh`, das primeiras linhas até `pronto. Próximo passo: make doctor`. Prova as três versões que o laboratório exige — Terraform 1.15.8, Python 3.12 e AWS CLI — vindas do próprio ambiente do aluno.
+
+<!-- ![](img/02-setup-do-lab.png) -->
+
+<details>
+<summary><b>💡 Clique para entender: o que o script instala e por que ele é seguro rodar de novo</b></summary>
+<blockquote>
+
+O `scripts/setup.sh` faz duas coisas, nesta ordem:
+
+1. **Confere o Terraform.** Se a versão instalada não for exatamente a **1.15.8**, ele baixa o binário oficial e verifica o **SHA-256** contra o checksum publicado pela HashiCorp, que está versionado dentro do script. Se a HashiCorp trocar o artefato remoto, a instalação falha em vez de instalar silenciosamente algo diferente do que a aula validou. Em um Codespaces criado com a configuração atual do repositório, essa etapa só imprime que a versão já está disponível.
+2. **Cria o `.venv`** com as versões exatas de `requirements.txt` (boto3, numpy, scikit-learn, PyYAML).
+
+Ele é **idempotente**: rodar duas vezes não quebra nada e não repete o que já está certo. Isso importa porque o mesmo Codespaces atravessa a disciplina inteira — na próxima aula, o script de outro lab instala apenas o delta daquele lab.
+
+Versão pinada não é preciosismo: é o que faz o número que aparece na sua tela ser o mesmo que aparece na tela do colega ao lado.
+
+</blockquote>
+</details>
+
+<details>
+<summary><b>⚠ Se der erro: <code>terraform: command not found</code> depois do script</b></summary>
+<blockquote>
+
+Acontece quando o `PATH` da sessão do terminal foi montado antes da instalação. Abra um terminal novo (`Terminal` → `New Terminal`) e confira:
+
+```bash
 terraform version
 .venv/bin/python --version
 ```
@@ -258,23 +293,12 @@ Saída esperada:
 ```text
 Terraform v1.15.8
 on linux_amd64
-Python 3.12.11
+Python 3.12.14
 ```
 
-A segunda linha descreve a arquitetura da máquina e pode variar (`linux_amd64` no Codespaces, `linux_arm64` em Mac com Apple Silicon). As outras duas precisam bater exatamente. A versão de patch do Python pode variar dentro da série 3.12.
+A segunda linha descreve a arquitetura da máquina e pode variar (`linux_amd64` no Codespaces, `linux_arm64` em Mac com Apple Silicon). As outras duas precisam bater — a versão de patch do Python pode variar dentro da série 3.12.
 
-<details>
-<summary><b>⚠ Se der erro: <code>terraform: command not found</code> ou a pasta <code>.venv</code> não existe</b></summary>
-<blockquote>
-
-A construção do container ainda está rodando, ou falhou. Abra o painel de log em `Codespaces: View Creation Log` (paleta de comandos com `F1`) e confira se o `postCreateCommand` terminou.
-
-Se terminou com erro, rode o script à mão e leia a mensagem:
-
-```bash
-cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
-bash .devcontainer/postCreate.sh
-```
+Se o `terraform` continuar ausente, seu Codespaces é anterior à configuração atual do repositório e a instalação do binário falhou. Rode `bash scripts/setup.sh` de novo e leia a mensagem de erro: quase sempre é rede ou o `sudo` do `install`.
 
 </blockquote>
 </details>
@@ -285,7 +309,7 @@ bash .devcontainer/postCreate.sh
 
 **3. Copie as credenciais do Learner Lab para dentro do Codespaces**
 
-Este Codespaces é uma máquina nova, então ele não tem as credenciais que você colou no Lab 01. Abra o arquivo de credenciais:
+As credenciais do Learner Lab valem **4 horas**. As que você colou na aula passada certamente expiraram, então o ritual é sempre o mesmo: sessão nova no Academy, credencial nova no Codespaces. Abra o arquivo de credenciais:
 
 ```bash
 code ~/.aws/credentials
@@ -293,10 +317,10 @@ code ~/.aws/credentials
 
 Na aba do AWS Academy, com o laboratório iniciado (bolinha verde), clique em `AWS Details` no canto superior direito e depois em `Show` na seção `AWS CLI`. Copie o bloco inteiro, cole no arquivo aberto no Codespaces e salve com `Ctrl+S` (ou `Cmd+S`).
 
-> 📸 **Print 02 — `img/02-credenciais-coladas.png`**
+> 📸 **Print 03 — `img/03-credenciais-coladas.png`**
 > Capture o arquivo `~/.aws/credentials` aberto no editor do Codespaces com o bloco colado, **cobrindo ou desfocando os valores de `aws_access_key_id`, `aws_secret_access_key` e `aws_session_token`**. Prova onde o arquivo fica e qual é o formato esperado, sem expor credencial em material didático.
 
-<!-- ![](img/02-credenciais-coladas.png) -->
+<!-- ![](img/03-credenciais-coladas.png) -->
 
 > [!IMPORTANT]
 > **A credencial do Academy vale 4 horas.** Ao voltar ao laboratório em outro dia, ou depois de um `End Lab`, repita este passo. Sinal típico de credencial vencida: qualquer comando da AWS responder `ExpiredToken` ou `InvalidClientTokenId`. Nenhum script deste lab imprime chave, segredo ou token em tela, então a única cópia visível é a que você acabou de colar.
@@ -382,10 +406,10 @@ AWS preflight
 [PASS] preflight
 ```
 
-> 📸 **Print 03 — `img/03-make-doctor.png`**
+> 📸 **Print 04 — `img/04-make-doctor.png`**
 > Capture o terminal desde `== tool versions ==` até `[PASS] preflight`, com o número da conta visível. Prova que o toolchain está na versão pinada, que a credencial responde, que a região é `us-east-1` e que a `LabRole` existe. É a foto do único portão que separa o aluno de gastar dinheiro em ambiente errado.
 
-<!-- ![](img/03-make-doctor.png) -->
+<!-- ![](img/04-make-doctor.png) -->
 
 <details>
 <summary><b>💡 Clique para entender: o que o portão verifica e por que ele existe antes de tudo</b></summary>
@@ -474,10 +498,10 @@ Saída esperada, literalmente igual à sua (com exceção do caminho, que traz o
 [data] written to /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system/artifacts/data
 ```
 
-> 📸 **Print 04 — `img/04-make-data.png`**
+> 📸 **Print 05 — `img/05-make-data.png`**
 > Capture as sete linhas acima, com os três prefixos de hash (`2013b9725797`, `18a0ddc5d4d8`, `04c4fdee573f`) legíveis. Prova que o dataset é reprodutível e serve de referência para o aluno comparar com o colega.
 
-<!-- ![](img/04-make-data.png) -->
+<!-- ![](img/05-make-data.png) -->
 
 **Compare com um colega agora.** Os três prefixos de hash e as três prevalências precisam ser idênticos aos dele. Se divergirem, alguém alterou o gerador ou a configuração, e todas as métricas do resto do laboratório vão divergir também.
 
@@ -613,10 +637,10 @@ data contract: 48 checks against /workspaces/FIAP-Cloud-Based-Machine-Learning/0
 [PASS] 0 of 48 checks failed
 ```
 
-> 📸 **Print 05 — `img/05-contrato-48-checks.png`**
+> 📸 **Print 06 — `img/06-contrato-48-checks.png`**
 > Capture o final da saída, com a linha `[PASS] 0 of 48 checks failed` e ao menos as três verificações de `schema.*` visíveis. Prova que o contrato é executável e que ele conhece a diferença entre o formato de treino (8 colunas, rótulo primeiro) e o de serving (7 colunas, sem rótulo).
 
-<!-- ![](img/05-contrato-48-checks.png) -->
+<!-- ![](img/06-contrato-48-checks.png) -->
 
 Repare no redirecionamento `> artifacts/contrato.json`: a narração que você vê na tela é o canal de diagnóstico, e o **resultado** do contrato é um JSON que ficou no arquivo. Todo script deste laboratório segue essa convenção, o que permite encadear qualquer um deles em automação sem parsear texto de log.
 
@@ -753,10 +777,10 @@ aws_sagemaker_training_job.churn: Creation complete after 1s
 Apply complete! Resources: 9 added, 0 changed, 0 destroyed.
 ```
 
-> 📸 **Print 06 — `img/06-apply-stage1.png`**
+> 📸 **Print 07 — `img/07-apply-stage1.png`**
 > Capture do cabeçalho `== stage 1/2: storage and training job ==` até a linha `Apply complete! Resources: 9 added, 0 changed, 0 destroyed.`. Prova que o armazenamento e o training job foram criados, e que nenhum recurso de serving entrou neste estágio.
 
-<!-- ![](img/06-apply-stage1.png) -->
+<!-- ![](img/07-apply-stage1.png) -->
 
 Repare em `aws_sagemaker_training_job.churn: Creation complete after 1s`. O Terraform criou o job em 1 segundo, mas o treino **não** terminou em 1 segundo. O que terminou foi a **submissão**: o Terraform pediu à AWS "comece a treinar" e a AWS respondeu "aceito". O treino roda de forma assíncrona, e é isso que o próximo passo resolve.
 
@@ -816,10 +840,10 @@ Sem que você digite nada, o `make apply` segue para o portão. Esta é a parte 
 [wait] wrote artifact.auto.tfvars.json for the serving stage
 ```
 
-> 📸 **Print 07 — `img/07-portao-artefato.png`**
+> 📸 **Print 08 — `img/08-portao-artefato.png`**
 > Capture do cabeçalho `== gate: ... ==` até a linha `wrote artifact.auto.tfvars.json`. Prova as quatro fases do treino, os 140 segundos cobrados, as duas métricas de AUC e o tamanho exato do artefato conferido com `HeadObject`. É o print mais importante do laboratório.
 
-<!-- ![](img/07-portao-artefato.png) -->
+<!-- ![](img/08-portao-artefato.png) -->
 
 Cinco fatos que essas linhas estabelecem, e vale conferir cada um na sua tela:
 
@@ -947,10 +971,10 @@ training_job_name = "prb-cloud-ml-lab1-train-a1b2c3d4"
 training_output_uri = "s3://prb-cloud-ml-lab1-123456789012/output/training/"
 ```
 
-> 📸 **Print 08 — `img/08-terraform-outputs.png`**
+> 📸 **Print 09 — `img/09-terraform-outputs.png`**
 > Capture o bloco `Outputs:` inteiro, com `deploy_serving = true`, `endpoint_name`, `model_artifact_uri` e os hiperparâmetros visíveis. Prova o inventário do sistema e serve de referência para o aluno voltar depois, quando precisar do nome do endpoint.
 
-<!-- ![](img/08-terraform-outputs.png) -->
+<!-- ![](img/09-terraform-outputs.png) -->
 
 Três observações sobre o que **não** está aqui:
 
@@ -971,10 +995,10 @@ Você deve ver um job com o nome que apareceu na saída (`prb-cloud-ml-lab1-trai
 - **Monitor**, com o tempo de execução e as métricas `train:auc` e `validation:auc` — os mesmos números do Passo 13.
 - **Output**, com o caminho S3 do `model.tar.gz`.
 
-> 📸 **Print 09 — `img/09-console-training-job.png`**
+> 📸 **Print 10 — `img/10-console-training-job.png`**
 > Capture a página de detalhe do training job, mostrando `Status: Completed` e a seção com as métricas. Prova que o recurso criado por Terraform é o mesmo que o console mostra, e conecta a linha de log ao objeto real na AWS.
 
-<!-- ![](img/09-console-training-job.png) -->
+<!-- ![](img/10-console-training-job.png) -->
 
 <details>
 <summary><b>⚠ Se der erro: <code>AccessDenied</code> ou a página do SageMaker não abre no Learner Lab</b></summary>
@@ -989,7 +1013,7 @@ aws sagemaker describe-training-job --training-job-name "$JOB" \
   --query '{status:TrainingJobStatus,seconds:BillableTimeInSeconds,metrics:FinalMetricDataList[].{name:MetricName,value:Value},artifact:ModelArtifacts.S3ModelArtifacts}'
 ```
 
-Nesse caso, capture o Print 09 a partir da saída deste comando no terminal.
+Nesse caso, capture o Print 10 a partir da saída deste comando no terminal.
 
 </blockquote>
 </details>
@@ -1002,10 +1026,10 @@ Nesse caso, capture o Print 09 a partir da saída deste comando no terminal.
 
 No console do SageMaker, vá em `Inference` → `Endpoints`. O endpoint deve estar com `Status: InService`.
 
-> 📸 **Print 10 — `img/10-console-endpoint-inservice.png`**
+> 📸 **Print 11 — `img/11-console-endpoint-inservice.png`**
 > Capture a lista (ou o detalhe) do endpoint com `Status: InService` e o tipo de instância `ml.m5.large` visível. Prova que existe um serviço vivo, e é a imagem que ancora a conversa de custo: a partir deste estado, a conta é cobrada por hora.
 
-<!-- ![](img/10-console-endpoint-inservice.png) -->
+<!-- ![](img/11-console-endpoint-inservice.png) -->
 
 Agora olhe a organização do bucket, que conta a história do fluxo de dados:
 
@@ -1025,10 +1049,10 @@ metadata/schema.json
 output/training/prb-cloud-ml-lab1-train-a1b2c3d4/output/model.tar.gz
 ```
 
-> 📸 **Print 11 — `img/11-bucket-layout.png`**
+> 📸 **Print 12 — `img/12-bucket-layout.png`**
 > Capture esta listagem, com os três prefixos (`input/`, `metadata/`, `output/`) visíveis e o `model.tar.gz` no fim. Prova que a entrada, os metadados e a saída do treino são separados, e mostra o artefato como objeto real no armazenamento.
 
-<!-- ![](img/11-bucket-layout.png) -->
+<!-- ![](img/12-bucket-layout.png) -->
 
 Três prefixos, três papéis: `input/` é o que o treino leu, `metadata/` é o que descreve o dataset (manifesto com as impressões digitais e o esquema), e `output/` é o que o treino produziu. O `model.tar.gz` que está ali é o **mesmo** objeto que o endpoint carregou em memória no Passo 14.
 
@@ -1074,10 +1098,10 @@ Saída esperada, com os números iguais aos seus:
 [PASS] smoke inference
 ```
 
-> 📸 **Print 12 — `img/12-make-predict.png`**
+> 📸 **Print 13 — `img/13-make-predict.png`**
 > Capture a saída inteira, com as duas requisições, as duas probabilidades (`0.964739` e `0.017099`) e as quatro verificações em `[PASS]`. Prova que existe um serviço respondendo a chamada e que a resposta é uma probabilidade, não um rótulo.
 
-<!-- ![](img/12-make-predict.png) -->
+<!-- ![](img/13-make-predict.png) -->
 
 **Este é o momento em que a pergunta da Helena passa a ter resposta.** Ela perguntou "dado um cliente, qual é a probabilidade de ele cancelar?". A resposta é `0.964739`, entregue por um endpoint HTTPS que qualquer sistema autorizado pode chamar.
 
@@ -1157,10 +1181,10 @@ Saída esperada:
 [evaluate] wrote .../artifacts/evidence/evaluation.json and evaluation.md
 ```
 
-> 📸 **Print 13 — `img/13-make-evaluate.png`**
+> 📸 **Print 14 — `img/14-make-evaluate.png`**
 > Capture a saída inteira, com os três lotes, as métricas e os quatro `[PASS]`. Prova que o modelo foi avaliado em dados que nunca viu, que ele bate o baseline e que as métricas do laboratório conferem com o scikit-learn.
 
-<!-- ![](img/13-make-evaluate.png) -->
+<!-- ![](img/14-make-evaluate.png) -->
 
 **Compare com um colega.** Todos os números aqui precisam ser idênticos aos dele, até a quarta casa decimal. É a semente fixa do dataset trabalhando: se `accuracy 0.7617` divergir, algo divergiu antes.
 
@@ -1257,10 +1281,10 @@ Calibração é o que permite usar a probabilidade como número, e não só como
 
 **Geral: PASS**
 
-> 📸 **Print 14 — `img/14-evaluation-md.png`**
+> 📸 **Print 15 — `img/15-evaluation-md.png`**
 > Capture o `evaluation.md` aberto no editor, mostrando a tabela de baseline e a tabela de aceitação com `Overall: PASS`. Prova que os critérios de aprovação estavam definidos em configuração antes do resultado, e que o veredito é uma consequência deles.
 
-<!-- ![](img/14-evaluation-md.png) -->
+<!-- ![](img/15-evaluation-md.png) -->
 
 Os três limiares vivem em `config/lab.yaml` e foram escritos **antes** de qualquer treino. Isso é o oposto do que costuma acontecer: treinar, ver que deu 0,81, e então declarar que 0,80 era a meta. Critério definido depois do resultado não é critério, é justificativa.
 
@@ -1325,10 +1349,10 @@ Saída esperada:
 
 Sete elos, sete verificações. Nenhuma delas lê um log ou confia em memória: cada uma consulta a AWS ou recalcula o valor.
 
-> 📸 **Print 15 — `img/15-make-evidence.png`**
+> 📸 **Print 16 — `img/16-make-evidence.png`**
 > Capture as oito linhas, com os sete `[PASS]` e o caminho do `evidence.md`. Prova que a cadeia inteira, do armazenamento à evidência, foi verificada de forma independente e no mesmo ciclo.
 
-<!-- ![](img/15-make-evidence.png) -->
+<!-- ![](img/16-make-evidence.png) -->
 
 ---
 
@@ -1459,10 +1483,10 @@ Destroy complete! Resources: 12 destroyed.
 
 Doze recursos: os nove do estágio 1 mais os três do estágio 2. O Terraform destrói na ordem inversa da criação, então o endpoint sai antes do bucket.
 
-> 📸 **Print 16 — `img/16-make-destroy.png`**
+> 📸 **Print 17 — `img/17-make-destroy.png`**
 > Capture a linha `Destroy complete! Resources: 12 destroyed.`. Prova que os doze recursos criados foram removidos no mesmo ciclo.
 
-<!-- ![](img/16-make-destroy.png) -->
+<!-- ![](img/17-make-destroy.png) -->
 
 <details>
 <summary><b>⚠ Se der erro: o destroy falha porque o bucket não está vazio</b></summary>
@@ -1512,10 +1536,10 @@ Saída esperada:
 [PASS] verify-clean
 ```
 
-> 📸 **Print 17 — `img/17-verify-clean.png`**
+> 📸 **Print 18 — `img/18-verify-clean.png`**
 > Capture as cinco linhas, com os quatro `[PASS]` e o `[PASS] verify-clean`. Prova, consultando a AWS diretamente, que nenhum recurso cobrável do laboratório sobrou. É o print que fecha o ciclo de custo.
 
-<!-- ![](img/17-verify-clean.png) -->
+<!-- ![](img/18-verify-clean.png) -->
 
 <details>
 <summary><b>💡 Clique para entender: por que verificar depois de destruir</b></summary>
@@ -1552,6 +1576,9 @@ Remove `artifacts/` e os caches do Python. **Nunca toca na AWS.** Só rode se vo
 O Codespaces também consome cota (de horas do GitHub, não do crédito AWS). Na aba do repositório: `Code` → `Codespaces` → três pontos ao lado do seu Codespace → `Stop codespace`.
 
 Ele preserva o disco, então você volta depois com tudo no lugar. A credencial da AWS, porém, terá vencido: reveja o Passo 3 ao retomar.
+
+> [!CAUTION]
+> **Pare, não apague.** Este é o Codespaces de toda a disciplina, inclusive do trabalho final. `Stop codespace` zera o consumo de horas e mantém o ambiente; `Delete` obrigaria você a repetir o Lab 01 do zero na próxima aula.
 
 ### Checkpoint
 
@@ -1670,6 +1697,7 @@ Enquanto isso, se quiser explorar por conta própria, três experimentos valem o
 ├── config/lab.yaml           # única fonte de verdade: região, semente, schema, aceitação
 ├── requirements.txt          # dependências Python com versão exata
 ├── scripts/                  # um script por etapa, todos executáveis à mão
+│   ├── setup.sh              #   instalação do lab dentro do Codespaces da disciplina
 │   ├── check_aws.py          #   make doctor
 │   ├── generate_dataset.py   #   make data
 │   ├── validate_data.py      #   contrato de dados (48 verificações)

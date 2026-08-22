@@ -1,0 +1,44 @@
+{
+  "name": "FIAP Cloud-Based ML",
+  // Ubuntu LTS recente. Vale para todos os laboratórios da disciplina e para o
+  // trabalho final: o aluno cria este Codespaces uma vez, na aula 1, e reusa.
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.12"
+    },
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/aws-cli:1": {},
+    // Versão exata, e não "latest": os labs fixam `required_version` no
+    // Terraform, então uma turma com versões diferentes depura Terraform em vez
+    // de arquitetura de ML.
+    "ghcr.io/devcontainers/features/terraform:1": {
+      "version": "1.15.8",
+      "tflint": "none",
+      "terragrunt": "none"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "postCreateCommand": "bash ${containerWorkspaceFolder}/.devcontainer/script.sh",
+  "remoteEnv": {
+    "AWS_DEFAULT_REGION": "us-east-1",
+    "AWS_REGION": "us-east-1"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "hashicorp.terraform",
+        "redhat.vscode-yaml",
+        "github.copilot"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "files.eol": "\n"
+      }
+    }
+  }
+}

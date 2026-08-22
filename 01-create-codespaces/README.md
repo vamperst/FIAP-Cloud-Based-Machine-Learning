@@ -1,6 +1,9 @@
 # 01 - Setup e configuração de ambiente
 
-Este é o **setup único** da disciplina. Você executa uma vez e tem tudo pronto para os laboratórios. Depois deste setup, antes de cada aula, siga o ritual rápido do [01.1 - Início de toda aula](./Inicio-de-aula.md).
+Este é o **setup único** da disciplina. Você executa uma vez, na primeira aula, e tem tudo pronto para **todos os laboratórios e para o trabalho final**. Depois deste setup, antes de cada aula, siga o ritual rápido do [01.1 - Início de toda aula](./Inicio-de-aula.md).
+
+> [!IMPORTANT]
+> **Um Codespaces e uma conta AWS para a disciplina inteira.** Você não cria um ambiente novo por laboratório: reabre sempre o mesmo. O que cada lab precisa de específico é instalado dentro dele por um script (`bash scripts/setup.sh`) no início do lab. Criar e apagar Codespaces a cada aula consome de 10 a 15 minutos de tempo de aula por vez — reabrir o que já existe leva segundos.
 
 > [!WARNING]
 > **Pré-requisitos — confira antes de começar:**
@@ -9,24 +12,27 @@ Este é o **setup único** da disciplina. Você executa uma vez e tem tudo pront
 > - [ ] Acesso ao email institucional `rm<SEU_RM>@fiap.com.br` via [webmail.fiap.com.br](http://webmail.fiap.com.br/).
 > - [ ] Navegador moderno (Chrome, Firefox ou Edge — evite Safari no macOS para o Codespaces).
 >
-> **O que você vai fazer:** fazer fork do repositório, criar um Codespaces conectado a ele, ativar a conta do AWS Academy Learner Lab, criar um bucket S3 permanente e copiar credenciais da AWS para dentro do Codespaces. **Tempo estimado: 30 minutos** (15-20 min ociosos esperando o Codespaces terminar de criar).
+> **O que você vai fazer:** fazer fork do repositório, criar **o** Codespaces da disciplina, ativar a conta do AWS Academy Learner Lab, criar um bucket S3 permanente e copiar credenciais da AWS para dentro do Codespaces. **Tempo estimado: 30 minutos** (15-20 min ociosos esperando o Codespaces terminar de criar).
 
 Você vai combinar **duas ferramentas** ao longo da disciplina:
 
 1. **Conta AWS via AWS Academy** — conta provisionada pela FIAP com $50 de crédito, renovada a cada 4 horas de sessão.
-2. **GitHub Codespaces** — IDE online idêntica para todos os alunos, com Terraform, Docker e AWS CLI já instalados.
+2. **GitHub Codespaces** — IDE online idêntica para todos os alunos, com Python 3.12, AWS CLI, Terraform 1.15.8, Node LTS, Docker e `make` já instalados.
 
 Os laboratórios assumem esse par funcionando. Sem o setup completo, os comandos do primeiro lab já falham.
+
+O ambiente vem do arquivo [`.devcontainer/devcontainer.json`](../.devcontainer/README.md) que está na raiz deste repositório — é o mesmo para toda a disciplina, então todo aluno recebe exatamente as mesmas versões de ferramenta.
 
 ## Principais pontos de aprendizagem
 
 - Por que usar Codespaces em vez de configurar o ambiente local (reprodutibilidade e suporte em sala).
 - Como funciona o **ciclo de 4 horas** das credenciais da AWS Academy.
 - Por que o bucket `base-config-<SEU_RM>` é permanente e os demais recursos são efêmeros.
+- Por que um único ambiente atende todos os labs, e o que cada lab instala por cima dele.
 
 ## O que você terá ao final
 
-Um Codespaces rodando com credenciais AWS ativas, bucket S3 permanente criado, e o comando `aws s3 ls` respondendo sem erro. A partir daí, você está pronto para o [Lab 02 - Do modelo ao sistema de Machine Learning](../02-ml-system/README.md).
+Um Codespaces rodando com credenciais AWS ativas, bucket S3 permanente criado, e o comando `aws s3 ls` respondendo sem erro. Esse é o ambiente que você vai reabrir em todas as aulas seguintes, inclusive no trabalho final. A partir daí, você está pronto para o [Lab 02 - Do modelo ao sistema de Machine Learning](../02-ml-system/README.md).
 
 > [!TIP]
 > Os blocos `<details><summary>💡 Clique para entender</summary>` aprofundam conceitos. Pule se estiver com pressa.
@@ -35,7 +41,7 @@ Um Codespaces rodando com credenciais AWS ativas, bucket S3 permanente criado, e
 
 | # | Parte | O que acontece | Tempo |
 |---|-------|---------------|-------|
-| 1 | [GitHub Codespaces](#parte-1---github-codespaces) | Fork do repo e criação do Codespaces (2-core, region US East). | ~10 min (espera) |
+| 1 | [GitHub Codespaces](#parte-1---github-codespaces) | Fork do repo e criação do **único** Codespaces da disciplina (2-core, region US East). | ~10 min (espera) |
 | 2 | [Conta AWS Academy](#parte-2---conta-aws-academy) | Ativar email FIAP, aceitar convite, iniciar o Learner Lab. | ~10 min |
 | 3 | [Bucket S3 permanente](#parte-3---bucket-s3-permanente) | Criar `base-config-<SEU_RM>` no console AWS. | ~2 min |
 | 4 | [Credenciais no Codespaces](#parte-4---credenciais-no-codespaces) | Copiar credenciais temporárias para `~/.aws/credentials`. | ~5 min |
@@ -61,9 +67,9 @@ Alternativas (máquina local, conta AWS pessoal, cloud shell da AWS) funcionam, 
 
 ### Resultado esperado desta parte
 
-Um Codespaces chamado `fiap-cloud-engineering` rodando na sua conta, com o repositório já clonado e um terminal pronto.
+Um Codespaces derivado de `FIAP-Cloud-Based-Machine-Learning` rodando na sua conta, com o repositório já clonado e um terminal pronto. **É o único que você vai criar na disciplina.**
 
-1. Acesse o repositório da disciplina: [fiap-cloud-engineering](https://github.com/vamperst/fiap-cloud-engineering).
+1. Acesse o repositório da disciplina: [FIAP-Cloud-Based-Machine-Learning](https://github.com/vamperst/FIAP-Cloud-Based-Machine-Learning).
 
 2. Clique no botão `Fork` no canto superior direito para copiar o repositório para a sua conta.
 
@@ -71,7 +77,7 @@ Um Codespaces chamado `fiap-cloud-engineering` rodando na sua conta, com o repos
      Botão Fork destacado no cabeçalho do repositório original. -->
 ![](img/fork1.png)
 
-3. Na tela de criação do fork, **deixe `Copy the main branch only` marcado** e clique em `Create Fork`.
+3. Na tela de criação do fork, **deixe `Copy the master branch only` marcado** e clique em `Create Fork`.
 
 <details>
 <summary><b>💡 Por que fork em vez de clonar?</b></summary>
@@ -98,9 +104,9 @@ O fork te dá uma cópia independente que pode receber seus commits sem afetar o
 
 | Campo | Valor |
 |-------|-------|
-| Repository | `fiap-cloud-engineering` |
-| Branch | `main` |
-| Dev container configuration | `FIAP Lab` |
+| Repository | `FIAP-Cloud-Based-Machine-Learning` |
+| Branch | `master` |
+| Dev container configuration | `FIAP Cloud-Based ML` |
 | Region | `US East` |
 | Machine type | `2-core` |
 
@@ -109,7 +115,7 @@ O fork te dá uma cópia independente que pode receber seus commits sem afetar o
 ![](img/codespaces3.png)
 
 > [!NOTE]
-> A criação do Codespaces demora **de 10 a 15 minutos** na primeira vez — ele precisa baixar o dev container (FIAP Lab), Terraform, Docker e AWS CLI. Nas próximas vezes, reabrir o mesmo Codespaces leva menos de 1 minuto.
+> A criação do Codespaces demora **de 10 a 15 minutos** na primeira vez — ele precisa baixar o dev container (`FIAP Cloud-Based ML`), Terraform, Docker e AWS CLI. Nas próximas vezes, reabrir o mesmo Codespaces leva menos de 1 minuto.
 
 7. Enquanto o Codespaces constrói, clique em `Building codespace` no canto inferior direito para acompanhar os logs.
 
@@ -123,7 +129,7 @@ O fork te dá uma cópia independente que pode receber seus commits sem afetar o
 ### Checkpoint
 
 - [x] Fork criado na sua conta GitHub.
-- [x] Codespaces `fiap-cloud-engineering` em estado `Running` (ou ainda `Building` — ok para seguir).
+- [x] Codespaces `FIAP-Cloud-Based-Machine-Learning` em estado `Running` (ou ainda `Building` — ok para seguir).
 
 ---
 
@@ -207,7 +213,7 @@ Clique em `End Lab` e depois em `Start Lab` novamente. Às vezes a primeira tent
 
 Um bucket `base-config-<SEU_RM>` criado no S3, em `us-east-1`, vazio.
 
-Este bucket é **permanente** durante toda a disciplina — ele guarda o estado do Terraform dos laboratórios. Criá-lo uma vez aqui evita reprovisionar a cada lab.
+Este bucket é **permanente** durante toda a disciplina. Ele é o seu ponto fixo entre as aulas: guarda o que precisa sobreviver ao fim de uma sessão do Learner Lab, como estado remoto de Terraform e artefatos que um lab entrega para o próximo. Os recursos criados dentro de cada laboratório, ao contrário, são efêmeros e destruídos no fim da aula.
 
 17. No console AWS (aberto no passo 16), abra o [serviço S3](https://us-east-1.console.aws.amazon.com/s3/home?region=us-east-1#).
 
@@ -224,7 +230,7 @@ Este bucket é **permanente** durante toda a disciplina — ele guarda o estado 
 ![](img/createBucket.png)
 
 > [!IMPORTANT]
-> **Use exatamente o formato `base-config-<RM>`** — todos os scripts dos labs detectam o bucket pelo prefixo `base-config-` via `aws s3 ls | awk '/base-config-/'`. Um nome diferente quebra todos os labs subsequentes.
+> **Use exatamente o formato `base-config-<RM>`** — os labs que precisam desse bucket o descobrem pelo prefixo `base-config-`, com `aws s3 ls | awk '/base-config-/'`. Um nome fora do padrão faz esses labs falharem sem mensagem clara.
 
 ### Checkpoint
 
@@ -298,9 +304,48 @@ Saída esperada: pelo menos uma linha com o bucket `base-config-<SEU_RM>` que vo
 
 ---
 
+## Como cada laboratório usa este ambiente
+
+Daqui em diante o padrão é sempre o mesmo, em toda aula e também no trabalho final:
+
+```
+Aula 1 (hoje) ─── cria o Codespaces ─── cria a conta AWS Academy ─── cria o bucket base-config-<RM>
+                        │
+                        ▼
+Aula N ─── reabre o MESMO Codespaces ─── cola as credenciais novas de 4 h
+                        │
+                        ▼
+              cd NN-nome-do-lab
+              bash scripts/setup.sh     ← instala o que é específico daquele lab
+              make doctor               ← confere ambiente e credenciais
+                        │
+                        ▼
+              passos do laboratório
+```
+
+Três consequências práticas:
+
+1. **Você nunca cria um Codespaces novo.** Se ele estiver `Stopped` em [github.com/codespaces](https://github.com/codespaces), clicar nele o religa em ~30 segundos.
+2. **A instalação específica de cada lab é um script, não um ambiente novo.** Ela é idempotente: rodar `bash scripts/setup.sh` duas vezes não quebra nada e instala só o que falta.
+3. **Suas alterações continuam lá.** Arquivos que você editou em um lab anterior permanecem no disco do Codespaces entre aulas.
+
+<details>
+<summary><b>💡 E se o professor atualizar o ambiente base durante a disciplina?</b></summary>
+<blockquote>
+
+Mudanças em `.devcontainer/` **não** chegam sozinhas a um Codespaces já criado — ele foi construído com a versão antiga do arquivo. Duas saídas:
+
+- **Recomendada:** rode o `bash scripts/setup.sh` do lab. Ele checa as ferramentas que o lab exige e instala o que estiver faltando ou fora da versão. Na maioria dos casos isso resolve, sem precisar recriar nada.
+- **Se o professor pedir explicitamente:** `Cmd/Ctrl+Shift+P` → `Codespaces: Rebuild Container`. O rebuild preserva os arquivos do repositório, mas leva os mesmos 10-15 minutos da primeira criação — por isso só é feito quando avisado.
+
+</blockquote>
+</details>
+
+---
+
 ## Conclusão
 
-Você agora tem três peças funcionando juntas: fork do repositório com os labs, Codespaces construído com todas as ferramentas, e credenciais AWS válidas por 4 horas. A partir daqui, cada início de aula é um ritual curto de 2-3 minutos (sync do fork + renovação de credenciais) descrito em [01.1 - Início de toda aula](./Inicio-de-aula.md).
+Você agora tem três peças funcionando juntas: fork do repositório com os labs, o Codespaces da disciplina construído com todas as ferramentas, e credenciais AWS válidas por 4 horas. A partir daqui, cada início de aula é um ritual curto de 2-3 minutos (sync do fork + renovação de credenciais) descrito em [01.1 - Início de toda aula](./Inicio-de-aula.md), seguido do script de instalação do lab do dia.
 
 ## Próximo passo
 
@@ -316,7 +361,7 @@ Siga direto para o [Lab 02 - Do modelo ao sistema de Machine Learning](../02-ml-
 |-------|---------|
 | Fork | Cópia independente de um repositório Git na sua conta, que pode receber seus commits. |
 | Codespaces | IDE cloud do GitHub baseada em VS Code, com ambiente pré-configurado via dev container. |
-| Dev container | Definição Docker do ambiente de desenvolvimento, versionada no próprio repositório. |
+| Dev container | Definição Docker do ambiente de desenvolvimento, versionada no próprio repositório. Nesta disciplina é único: [`.devcontainer/`](../.devcontainer/README.md) na raiz. |
 | AWS Academy | Programa educacional da AWS que dá acesso a uma conta real por período limitado. |
 | Learner Lab | Tipo de laboratório do Academy com sessão de 4 horas e $50 de crédito. |
 | `~/.aws/credentials` | Arquivo padrão onde o AWS CLI busca chaves temporárias/permanentes. |
@@ -339,7 +384,7 @@ Siga direto para o [Lab 02 - Do modelo ao sistema de Machine Learning](../02-ml-
 
 **Canais, em ordem:**
 
-1. [Issues deste repositório](https://github.com/vamperst/fiap-cloud-engineering/issues) — preferido, cria histórico pesquisável.
+1. [Issues deste repositório](https://github.com/vamperst/FIAP-Cloud-Based-Machine-Learning/issues) — preferido, cria histórico pesquisável.
 2. Email do professor com os 4 itens acima.
 3. Na sala de aula, durante a próxima aula.
 

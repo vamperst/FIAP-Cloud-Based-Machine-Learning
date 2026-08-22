@@ -64,7 +64,7 @@ Codespaces rodando com o terminal aberto, repositório local atualizado via `git
 
 3. Acesse [github.com/codespaces](https://github.com/codespaces).
 
-4. Clique no Codespaces que você criou no setup (derivado de `fiap-cloud-engineering`). Se estiver `Stopped`, ele vai reiniciar automaticamente — leva ~30 segundos.
+4. Clique no Codespaces que você criou no setup (derivado de `FIAP-Cloud-Based-Machine-Learning`). Se estiver `Stopped`, ele vai reiniciar automaticamente — leva ~30 segundos.
 
 <!-- PRINT SUGERIDO: img/codespacess11.png
      Lista de Codespaces com o ambiente da disciplina destacado. -->
@@ -73,7 +73,7 @@ Codespaces rodando com o terminal aberto, repositório local atualizado via `git
 5. No terminal do Codespaces, atualize o repositório local para puxar o que você sincronizou no GitHub na Parte 1:
 
 ```bash
-git pull origin main
+git pull origin master
 ```
 
 ### Checkpoint
@@ -191,6 +191,15 @@ As credenciais novas não foram salvas corretamente. Verifique:
 
 Ambiente armado, credenciais frescas, pronto para o lab do dia. Agora vá direto para a URL do laboratório que o professor indicou no começo da aula.
 
+O primeiro passo de cada lab é a instalação específica dele dentro deste mesmo Codespaces — algo como:
+
+```bash
+cd 02-ml-system
+bash scripts/setup.sh
+```
+
+O README do lab traz o comando exato. O script é idempotente: se você já rodou em outra aula, ele confere o que está instalado e não repete trabalho.
+
 > [!CAUTION]
 > **Ao final da aula**, desligue o Codespaces em [github.com/codespaces](https://github.com/codespaces) → 3 pontinhos → `Stop Codespace`. Isso preserva suas 120h/mês gratuitas do plano estudante.
 
@@ -209,7 +218,7 @@ Ambiente armado, credenciais frescas, pronto para o lab do dia. Agora vá direto
 
 **Canais, em ordem:**
 
-1. [Issues deste repositório](https://github.com/vamperst/fiap-cloud-engineering/issues) — preferido, cria histórico pesquisável.
+1. [Issues deste repositório](https://github.com/vamperst/FIAP-Cloud-Based-Machine-Learning/issues) — preferido, cria histórico pesquisável.
 2. Email do professor com os 4 itens acima.
 3. Na sala de aula, durante o laboratório.
 
