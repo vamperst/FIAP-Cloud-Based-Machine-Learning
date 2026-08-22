@@ -1,5 +1,5 @@
 {
-  "name": "FIAP Cloud-Based ML",
+  "name": "FIAP Lab",
   // Ubuntu LTS recente. Vale para todos os laboratórios da disciplina e para o
   // trabalho final: o aluno cria este Codespaces uma vez, na aula 1, e reusa.
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",

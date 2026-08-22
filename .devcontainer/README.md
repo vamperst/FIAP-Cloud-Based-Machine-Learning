@@ -62,11 +62,11 @@ AWS CLI, Node e Git não têm esse acoplamento: eles leem e escrevem formatos es
 ### Imagem base
 
 ```json
-"name": "FIAP Cloud-Based ML",
+"name": "FIAP Lab",
 "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04"
 ```
 
-O `name` é o rótulo que aparece no campo `Dev container configuration` da tela de criação do Codespaces — o aluno seleciona `FIAP Cloud-Based ML`. A imagem é a oficial da Microsoft para Dev Containers, com Ubuntu 24.04 enxuto.
+O `name` é o rótulo que aparece no campo `Dev container configuration` da tela de criação do Codespaces — o aluno seleciona `FIAP Lab`. A imagem é a oficial da Microsoft para Dev Containers, com Ubuntu 24.04 enxuto.
 
 ### Features — ferramentas injetadas na imagem
 

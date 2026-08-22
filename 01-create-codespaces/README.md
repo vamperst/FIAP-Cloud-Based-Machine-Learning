@@ -106,7 +106,7 @@ O fork te dá uma cópia independente que pode receber seus commits sem afetar o
 |-------|-------|
 | Repository | `FIAP-Cloud-Based-Machine-Learning` |
 | Branch | `master` |
-| Dev container configuration | `FIAP Cloud-Based ML` |
+| Dev container configuration | `FIAP Lab` |
 | Region | `US East` |
 | Machine type | `2-core` |
 
@@ -115,7 +115,7 @@ O fork te dá uma cópia independente que pode receber seus commits sem afetar o
 ![](img/codespaces3.png)
 
 > [!NOTE]
-> A criação do Codespaces demora **de 10 a 15 minutos** na primeira vez — ele precisa baixar o dev container (`FIAP Cloud-Based ML`), Terraform, Docker e AWS CLI. Nas próximas vezes, reabrir o mesmo Codespaces leva menos de 1 minuto.
+> A criação do Codespaces demora **de 10 a 15 minutos** na primeira vez — ele precisa baixar o dev container (`FIAP Lab`), Terraform, Docker e AWS CLI. Nas próximas vezes, reabrir o mesmo Codespaces leva menos de 1 minuto.
 
 7. Enquanto o Codespaces constrói, clique em `Building codespace` no canto inferior direito para acompanhar os logs.
 
