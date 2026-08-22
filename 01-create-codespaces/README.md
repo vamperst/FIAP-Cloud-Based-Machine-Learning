@@ -140,9 +140,12 @@ O fork te dá uma cópia independente que pode receber seus commits sem afetar o
 Conta AWS Academy ativa com o `Learner Lab` iniciado e a bolinha verde ao lado de "AWS" no topo da tela.
 
 8. Se ainda **não tem conta** no AWS Academy:
-   1. Acesse seu email FIAP em [webmail.fiap.com.br](http://webmail.fiap.com.br/). Seu endereço é `rm<SEU_RM>@fiap.com.br` e a senha é a mesma dos portais.
-   2. Procure um email de convite do Academy na caixa de entrada e siga as instruções.
-   3. Ao entrar no Academy, aparecerá uma turma chamada `AWS Academy Learner Lab`. Clique em `Enroll` para aceitar.
+
+   **8.1.** Acesse seu email FIAP em [webmail.fiap.com.br](http://webmail.fiap.com.br/). Seu endereço é `rm<SEU_RM>@fiap.com.br` e a senha é a mesma dos portais.
+
+   **8.2.** Procure um email de convite do Academy na caixa de entrada e siga as instruções.
+
+   **8.3.** Ao entrar no Academy, aparecerá uma turma chamada `AWS Academy Learner Lab`. Clique em `Enroll` para aceitar.
 
 9. Para entrar em uma conta **já existente**, acesse [awsacademy.com/LMS_Login](https://www.awsacademy.com/LMS_Login).
 
