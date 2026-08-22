@@ -44,13 +44,13 @@ Um endpoint SageMaker em tempo real servindo um XGBoost treinado na sua própria
 
 | Parte | O que você faz | Passos | Tempo |
 |---|---|---|---|
-| [Parte 1 - Ambiente e credenciais](#parte-1---ambiente-e-credenciais) | Reabre o Codespaces da disciplina, instala o que é específico do lab, renova a credencial do Academy e roda o portão de entrada. | [1](#passo-1) · [2](#passo-2) · [3](#passo-3) · [4](#passo-4) · [5](#passo-5) · [6](#passo-6) | ~15 min |
-| [Parte 2 - Dados e contrato](#parte-2---dados-e-contrato) | Gera o dataset, inspeciona os arquivos e roda o contrato de dados. Quebra o contrato de propósito. | [7](#passo-7) · [8](#passo-8) · [9](#passo-9) · [10](#passo-10) | ~15 min |
-| [Parte 3 - Provisionamento, treino e serving](#parte-3---provisionamento-treino-e-serving) | Sobe armazenamento, treino, artefato e serving com um comando, em dois estágios. | [11](#passo-11) · [12](#passo-12) · [13](#passo-13) · [14](#passo-14) · [15](#passo-15) · [16](#passo-16) · [17](#passo-17) | ~20 min |
-| [Parte 4 - Chamando o modelo e medindo o que ele vale](#parte-4---chamando-o-modelo-e-medindo-o-que-ele-vale) | Chama o endpoint com dois registros, depois com as 600 linhas de teste, e lê as métricas. | [18](#passo-18) · [19](#passo-19) · [20](#passo-20) · [21](#passo-21) | ~15 min |
-| [Parte 5 - O dossiê e a decisão](#parte-5---o-dossiê-e-a-decisão) | Consolida o pacote de evidência e escreve a recomendação para a área de negócio. | [22](#passo-22) · [23](#passo-23) · [24](#passo-24) | ~15 min |
-| [Parte 6 - Encerramento e limpeza](#parte-6---encerramento-e-limpeza) | Destrói tudo, prova por API que nada faturável sobrou e desliga o Codespaces. | [25](#passo-25) · [26](#passo-26) · [27](#passo-27) · [28](#passo-28) | ~10 min |
-| [Rodando o ciclo inteiro de novo](#rodando-o-ciclo-inteiro-de-novo) | Repete tudo com um único comando, com limpeza garantida. **Opcional**, se houver tempo em aula. | [29](#passo-29) | ~15 min |
+| [Parte 1 - Ambiente e credenciais](#parte-1---ambiente-e-credenciais) | Reabre o Codespaces da disciplina, instala o que é específico do lab e roda o portão de entrada. | [1](#passo-1) · [2](#passo-2) · [3](#passo-3) · [4](#passo-4) | ~10 min |
+| [Parte 2 - Dados e contrato](#parte-2---dados-e-contrato) | Gera o dataset, inspeciona os arquivos e roda o contrato de dados. Quebra o contrato de propósito. | [5](#passo-5) · [6](#passo-6) · [7](#passo-7) · [8](#passo-8) | ~15 min |
+| [Parte 3 - Provisionamento, treino e serving](#parte-3---provisionamento-treino-e-serving) | Sobe armazenamento, treino, artefato e serving com um comando, em dois estágios. | [9](#passo-9) · [10](#passo-10) · [11](#passo-11) · [12](#passo-12) · [13](#passo-13) · [14](#passo-14) · [15](#passo-15) | ~20 min |
+| [Parte 4 - Chamando o modelo e medindo o que ele vale](#parte-4---chamando-o-modelo-e-medindo-o-que-ele-vale) | Chama o endpoint com dois registros, depois com as 600 linhas de teste, e lê as métricas. | [16](#passo-16) · [17](#passo-17) · [18](#passo-18) · [19](#passo-19) | ~15 min |
+| [Parte 5 - O dossiê e a decisão](#parte-5---o-dossiê-e-a-decisão) | Consolida o pacote de evidência e escreve a recomendação para a área de negócio. | [20](#passo-20) · [21](#passo-21) · [22](#passo-22) | ~15 min |
+| [Parte 6 - Encerramento e limpeza](#parte-6---encerramento-e-limpeza) | Destrói tudo, prova por API que nada faturável sobrou e desliga o Codespaces. | [23](#passo-23) · [24](#passo-24) · [25](#passo-25) | ~10 min |
+| [Rodando o ciclo inteiro de novo](#rodando-o-ciclo-inteiro-de-novo) | Repete tudo com um único comando, com limpeza garantida. **Opcional**, se houver tempo em aula. | [26](#passo-26) | ~15 min |
 
 Travou em algum passo? Clique no número na tabela acima para pular direto para ele.
 
@@ -74,9 +74,9 @@ Você vai responder a essa pergunta três vezes ao longo do lab, e a resposta mu
 
 | Momento | A resposta existe? | Um sistema consegue chamar? |
 |---|---|---|
-| Depois do Passo 7 (dataset gerado) | Não. Só existem dados. | Não |
-| Depois do Passo 13 (modelo treinado) | Sim, dentro de um arquivo `model.tar.gz` no S3. | Não. Ninguém chama um `.tar.gz`. |
-| Depois do Passo 18 (endpoint respondendo) | Sim. | Sim, por HTTPS, com credencial e resposta em milissegundos. |
+| Depois do Passo 5 (dataset gerado) | Não. Só existem dados. | Não |
+| Depois do Passo 10 (modelo treinado) | Sim, dentro de um arquivo `model.tar.gz` no S3. | Não. Ninguém chama um `.tar.gz`. |
+| Depois do Passo 16 (endpoint respondendo) | Sim. | Sim, por HTTPS, com credencial e resposta em milissegundos. |
 
 ### Por que esta arquitetura existe
 
@@ -84,6 +84,12 @@ Você vai responder a essa pergunta três vezes ao longo do lab, e a resposta mu
 |---|---|---|---|
 | Retenção precisa do risco de cancelamento durante a ligação | "Qual a probabilidade **deste** cliente cancelar, agora, em ~50 ms" | "Qual o risco de todos os 180 mil clientes, hoje à noite" (isso é trabalho de batch, não de endpoint) | Atendimento, cobrança, antifraude: decisão individual e síncrona |
 | Marketing quer priorizar uma campanha mensal | Nada. O endpoint fica ligado 24/7 esperando chamada que vem uma vez por mês | Custo por predição altíssimo. O caso pede Batch Transform | Relatório mensal, score de carteira, mala direta |
+
+### Arquitetura do lab
+
+![Arquitetura: Codespaces e Terraform provisionam o treino em dois estágios; o dataset entra pelo S3, o SageMaker Training Job grava o model.tar.gz, a LabRole autoriza a execução, e o SageMaker Model expõe o Endpoint que o Boto3 chama para prever o churn.](diagramas/arquitetura.png)
+
+Você (via `make apply`) aciona o Terraform em dois estágios. O primeiro sobe o S3 e submete o Training Job, que lê os dados e grava o `model.tar.gz`; o segundo cria o Model e o Endpoint a partir desse artefato. A `LabRole` do IAM é a permissão que o SageMaker assume nos dois estágios — a linha tracejada no diagrama, para não confundir com o caminho do dado. No fim, `make predict` e `make evaluate` chamam o Endpoint por Boto3 para ler a probabilidade de cancelamento. Fonte editável em [`diagramas/arquitetura.excalidraw`](diagramas/arquitetura.excalidraw).
 
 ### A cadeia de capacidades
 
@@ -127,7 +133,7 @@ flowchart LR
 Guarde a diferença de cor entre o bloco laranja e o bloco rosa, porque ela é a diferença que aparece na fatura:
 
 - **Treino (laranja)** é computação finita. A instância sobe, treina por cerca de dois minutos e meio, escreve o artefato e é destruída pela própria AWS. Você paga só esse tempo e o gasto termina sozinho.
-- **Serving (rosa)** é computação persistente. A instância sobe e **fica de pé esperando chamadas**, 24 horas por dia, cobrando por hora, mesmo que ninguém chame nada. Ela só para de cobrar quando alguém a destrói. Esse alguém é você, no Passo 25.
+- **Serving (rosa)** é computação persistente. A instância sobe e **fica de pé esperando chamadas**, 24 horas por dia, cobrando por hora, mesmo que ninguém chame nada. Ela só para de cobrar quando alguém a destrói. Esse alguém é você, no Passo 23.
 
 > [!CAUTION]
 > **O único jeito de gastar de verdade neste laboratório é esquecer o endpoint ligado.**
@@ -138,7 +144,7 @@ Guarde a diferença de cor entre o bloco laranja e o bloco rosa, porque ela é a
 > | **Endpoint em tempo real (`ml.m5.large`)** | **Enquanto existir, 24/7, mesmo sem chamada** | **na casa de US$ 0,10 a US$ 0,15 por hora, ou seja, ~US$ 3 por dia e ~US$ 90 por mês** |
 > | S3 (~200 KB de dados) | Armazenamento | centavos por mês |
 >
-> Um endpoint esquecido por duas semanas consome mais do que o crédito de US$ 50 do Learner Lab e derruba a sua conta no meio da disciplina. Valores exatos na [página de preços do SageMaker](https://aws.amazon.com/sagemaker/pricing/). O Passo 25 destrói tudo, e o Passo 26 prova que foi destruído.
+> Um endpoint esquecido por duas semanas consome mais do que o crédito de US$ 50 do Learner Lab e derruba a sua conta no meio da disciplina. Valores exatos na [página de preços do SageMaker](https://aws.amazon.com/sagemaker/pricing/). O Passo 23 destrói tudo, e o Passo 24 prova que foi destruído.
 
 <details>
 <summary><b>💡 Clique para entender: por que o Terraform sozinho não consegue subir isso de uma vez</b></summary>
@@ -266,7 +272,7 @@ O `scripts/setup.sh` faz duas coisas, nesta ordem:
 
 Ele é **idempotente**: rodar duas vezes não quebra nada e não repete o que já está certo. Isso importa porque o mesmo Codespaces atravessa a disciplina inteira — na próxima aula, o script de outro lab instala apenas o delta daquele lab.
 
-Versão pinada não é preciosismo: é o que faz o número que aparece na sua tela ser o mesmo que aparece na tela do colega ao lado.
+Versão pinada não é preciosismo: é o que garante que o número na sua tela é o mesmo que este README publica como esperado.
 
 </blockquote>
 </details>
@@ -299,9 +305,9 @@ Se o `terraform` continuar ausente, seu Codespaces é anterior à configuração
 
 ---
 
-<a id="passo-5"></a>
+<a id="passo-3"></a>
 
-**5. Conheça a superfície de comandos do laboratório**
+**3. Conheça a superfície de comandos do laboratório**
 
 ```bash
 cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
@@ -332,13 +338,39 @@ Lab 1 - From Model to Machine Learning System
   Keep resources:  make e2e KEEP_RESOURCES=1   (you must run make destroy later)
 ```
 
-São 14 comandos, e é a lista inteira do laboratório. Nada acontece por baixo do pano: cada um deles é uma linha de `terraform` ou de `python scripts/...` que você pode abrir e ler no `Makefile`.
+São 14 comandos, e é a lista inteira do laboratório. Nada acontece por baixo do pano: cada um deles é uma chamada de `terraform` ou de `python scripts/...` que você pode abrir e ler no `Makefile`.
+
+<details>
+<summary><b>💡 Clique para entender: o que cada comando faz de verdade</b></summary>
+<blockquote>
+
+| Comando | O que ele roda | Por que existe |
+|---|---|---|
+| `make help` | Lista os targets do `Makefile` | Ponto de entrada. Não toca em nada |
+| `make doctor` | `terraform version` + versão do Python e das libs + `check_aws.py` (credencial, região, `LabRole`) | Portão de entrada: barra o resto se o ambiente estiver errado |
+| `make data` | `generate_dataset.py --clean`: recria os 6 arquivos em `artifacts/data/` a partir da semente fixa | Único jeito de gerar dataset neste lab. Roda em menos de 1 segundo, sem AWS |
+| `make fmt` | `terraform fmt -recursive`: reescreve a formatação dos `.tf` | Higiene de código, não afeta o que é criado na AWS |
+| `make validate` | `terraform init` + `terraform fmt -check` + `terraform validate` | Confere sintaxe e providers antes de planejar ou aplicar. `plan` e `apply` já rodam isso sozinhos |
+| `make plan` | `validate` e depois `terraform plan` | Mostra o que **vai** mudar, sem mudar nada. Sempre antes do primeiro `apply` |
+| `make apply` | `data` + `validate`, depois os dois estágios de Terraform com o portão (`wait_training.py`) no meio | O comando que sobe tudo: storage, treino e serving, em um passo só |
+| `make predict` | `predict.py`: duas chamadas de fumaça ao endpoint (`high_risk`, `low_risk`) | Confirma que o endpoint responde e que a ordenação de risco faz sentido, antes de gastar tempo avaliando |
+| `make evaluate` | `evaluate_endpoint.py`: pontua as 600 linhas de teste em lotes e calcula as métricas | Mede o modelo contra o conjunto que ele nunca viu, e compara com o baseline majoritário |
+| `make evidence` | `evidence.py`: junta os sete elos (dados, treino, artefato, serving, avaliação) num dossiê | Gera `evidence.md`, o documento que prova a cadeia inteira |
+| `make destroy` | `terraform destroy` na infraestrutura provisionada | Desliga tudo que foi criado. Ordem inversa da criação |
+| `make verify-clean` | `verify_clean.py`: pergunta direto à API da AWS se sobrou endpoint, config, modelo ou bucket deste lab | Não confia no que o Terraform *acha* que destruiu — confirma pela fonte |
+| `make e2e` | Encadeia `doctor` → `apply` → `predict` → `evaluate` → `evidence`, com `destroy` e `verify-clean` numa `trap` de saída | Ciclo completo automatizado, usado para validar o lab antes de chegar até você |
+| `make clean` | Apaga `artifacts/` e os caches do Python, localmente | Nunca toca na AWS. Serve para recomeçar do zero na sua máquina |
+
+Repare nas dependências: `apply` já roda `data` e `validate` sozinho, e `plan` já roda `validate`. Você não precisa encadear os comandos manualmente — o `Makefile` faz isso por você.
+
+</blockquote>
+</details>
 
 ---
 
-<a id="passo-6"></a>
+<a id="passo-4"></a>
 
-**6. Rode o portão de entrada**
+**4. Rode o portão de entrada**
 
 ```bash
 make doctor
@@ -378,7 +410,7 @@ O `doctor` faz quatro perguntas e responde todas antes de criar qualquer recurso
 | A região é `us-east-1`? | Compara a região da sessão com a exigida em `config/lab.yaml` | O Learner Lab só libera recursos em `us-east-1`. Em outra região a criação falha com mensagem de permissão, que parece problema de IAM e não é |
 | A `LabRole` existe? | `iam:GetRole` | O SageMaker precisa assumir uma role para ler o S3 e escrever o artefato. O Academy não permite criar IAM, então o lab usa a role pré-existente |
 
-Repare no `caller`: o número da conta aparece mascarado (`1234****9012`). O laboratório inteiro segue essa regra, e nenhum script imprime credencial.
+O `caller` aparece com o número da conta mascarado (`1234****9012`) — o laboratório inteiro segue essa regra, e nenhum script imprime credencial.
 
 </blockquote>
 </details>
@@ -430,9 +462,9 @@ Seis arquivos em `artifacts/data/`, com impressão digital SHA-256 registrada, e
 
 > A parte que mais parece burocrática é a que mais evita retrabalho. Vamos gerar os dados, olhar o que foi gerado, rodar o contrato e depois quebrá-lo de propósito, para ver o contrato pegando o erro.
 
-<a id="passo-7"></a>
+<a id="passo-5"></a>
 
-**7. Gere o dataset**
+**5. Gere o dataset**
 
 ```bash
 cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
@@ -470,7 +502,7 @@ O dataset é sintético e representa a base da Bora Fibra com sete característi
 | `premium_plan` | 1 se o plano é premium | 0 ou 1 |
 | `churn` | **o que queremos prever**: 1 se o cliente cancelou | 0 ou 1 |
 
-Ele é sintético por dois motivos práticos. Primeiro, dado real de cliente não pode circular em material de aula. Segundo, e mais importante para o laboratório: como ele nasce de uma semente fixa, **todo aluno obtém exatamente os mesmos números** em todas as etapas seguintes. Isso transforma a comparação com o colega em ferramenta de autocorreção. Em um dataset com amostragem aleatória, você nunca saberia se o 0,76 de acurácia do colega é o mesmo fenômeno que o seu 0,74.
+Ele é sintético por dois motivos. Primeiro, dado real de cliente não pode circular em material de aula. Segundo: como nasce de uma semente fixa, **todo aluno obtém exatamente os mesmos números** em todas as etapas seguintes, e os valores publicados neste README viram a régua de autocorreção — se o seu número bate com o que está aqui, seus dados estão certos. Em dataset com amostragem aleatória essa conferência não existiria: 0,76 de acurácia poderia ser o resultado esperado ou um bug, e não haveria como saber.
 
 A relação entre as características e o cancelamento foi construída para ser aprendível mas não trivial: cliente novo, com mensalidade alta, muitos chamados de suporte e atraso de pagamento tem risco alto; contrato anual e plano premium seguram. Aproximadamente um terço da base cancela (`prevalence 0.3375`), o que deixa o baseline majoritário em 66%, um adversário respeitável.
 
@@ -479,9 +511,9 @@ A relação entre as características e o cancelamento foi construída para ser 
 
 ---
 
-<a id="passo-8"></a>
+<a id="passo-6"></a>
 
-**8. Olhe os arquivos que foram gerados**
+**6. Olhe os arquivos que foram gerados**
 
 ```bash
 ls -la artifacts/data
@@ -560,9 +592,9 @@ Parece detalhe de formato. É a origem de duas das falhas mais caras em projetos
 
 ---
 
-<a id="passo-9"></a>
+<a id="passo-7"></a>
 
-**9. Rode o contrato de dados**
+**7. Rode o contrato de dados**
 
 O contrato é código executável, não documento. Rode:
 
@@ -584,15 +616,15 @@ data contract: 48 checks against /workspaces/FIAP-Cloud-Based-Machine-Learning/0
 [PASS] 0 of 48 checks failed
 ```
 
-![](img/06-contrato-48-checks.png)
+![](img/08-contrato-48-checks.png)
 
 Repare no redirecionamento `> artifacts/contrato.json`: a narração que você vê na tela é o canal de diagnóstico, e o **resultado** do contrato é um JSON que ficou no arquivo. Todo script deste laboratório segue essa convenção, o que permite encadear qualquer um deles em automação sem parsear texto de log.
 
 ---
 
-<a id="passo-10"></a>
+<a id="passo-8"></a>
 
-**10. Quebre o contrato de propósito**
+**8. Quebre o contrato de propósito**
 
 Um contrato que nunca reprovou nada não é confiável. Vamos adicionar um cliente a mais no arquivo de origem, sem mexer em nada mais, e ver o que acontece:
 
@@ -621,7 +653,7 @@ make data
 PYTHONPATH=src .venv/bin/python scripts/validate_data.py > /dev/null
 ```
 
-A última linha precisa voltar a ser `[PASS] 0 of 48 checks failed`. O `make data` regenera tudo do zero a partir da semente, então os hashes voltam a ser os mesmos do Passo 7.
+A última linha precisa voltar a ser `[PASS] 0 of 48 checks failed`. O `make data` regenera tudo do zero a partir da semente, então os hashes voltam a ser os mesmos do Passo 5.
 
 <details>
 <summary><b>💡 Clique para entender: por que isso roda ANTES de tocar na AWS</b></summary>
@@ -639,9 +671,9 @@ Essa é a versão prática de "falhe cedo, falhe pequeno": a verificação mais 
 ### Checkpoint
 
 - [x] `artifacts/data/` tem os seis arquivos.
-- [x] Os prefixos de hash do Passo 7 são iguais aos do seu colega.
+- [x] Os prefixos de hash batem com os publicados no Passo 5 (`2013b9725797`, `18a0ddc5d4d8`, `04c4fdee573f`).
 - [x] O contrato responde `[PASS] 0 of 48 checks failed`.
-- [x] Você viu o contrato reprovar de verdade no Passo 10 e voltar a aprovar depois do `make data`.
+- [x] Você viu o contrato reprovar de verdade no Passo 8 e voltar a aprovar depois do `make data`.
 
 Continua sem nenhum recurso criado na AWS, e continua custando zero.
 
@@ -653,11 +685,11 @@ Continua sem nenhum recurso criado na AWS, e continua custando zero.
 Um bucket S3 com os dados, um training job **concluído**, um `model.tar.gz` de verdade no S3 e um endpoint no estado `InService` — tudo saindo de um único `make apply`, que por dentro são dois estágios de Terraform com um portão entre eles.
 
 > [!CAUTION]
-> **A partir do Passo 12 você começa a gastar.** O training job custa uma fração de centavo e se encerra sozinho. O endpoint, a partir do Passo 14, cobra por hora até você destruí-lo. Se a aula terminar antes da Parte 6, rode `make destroy` de qualquer forma: você pode recriar tudo depois com um comando.
+> **A partir do Passo 10 você começa a gastar.** O training job custa uma fração de centavo e se encerra sozinho. O endpoint, a partir do Passo 11, cobra por hora até você destruí-lo. Se a aula terminar antes da Parte 6, rode `make destroy` de qualquer forma: você pode recriar tudo depois com um comando.
 
-<a id="passo-11"></a>
+<a id="passo-9"></a>
 
-**11. Leia o plano antes de criar nada**
+**9. Leia o plano antes de criar nada**
 
 ```bash
 cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
@@ -693,9 +725,9 @@ Ler o plano é um hábito de engenharia, não uma etapa opcional do laboratório
 
 ---
 
-<a id="passo-12"></a>
+<a id="passo-10"></a>
 
-**12. Aplique o primeiro estágio: armazenamento e treino**
+**10. Aplique o primeiro estágio: armazenamento e treino**
 
 ```bash
 cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
@@ -721,15 +753,21 @@ aws_sagemaker_training_job.churn: Creation complete after 1s
 Apply complete! Resources: 9 added, 0 changed, 0 destroyed.
 ```
 
-![](img/07-apply-stage1.png)
+![](img/12-make-apply.png)
 
-Repare em `aws_sagemaker_training_job.churn: Creation complete after 1s`. O Terraform criou o job em 1 segundo, mas o treino **não** terminou em 1 segundo. O que terminou foi a **submissão**: o Terraform pediu à AWS "comece a treinar" e a AWS respondeu "aceito". O treino roda de forma assíncrona, e é isso que o próximo passo resolve.
+Repare em `aws_sagemaker_training_job.churn: Creation complete after 1s`. O Terraform criou o job em 1 segundo, mas o treino **não** terminou em 1 segundo. O que terminou foi a **submissão**: o Terraform pediu à AWS "comece a treinar" e a AWS respondeu "aceito". O treino roda de forma assíncrona, e é o portão entre os dois estágios que espera o resultado:
+
+```text
+[wait] Completed in 147s billable
+```
+
+Essa linha (o número exato varia) é o portão confirmando que o treino terminou e provando o artefato com `HeadObject` antes de liberar o estágio 2. É isso que o próximo passo continua.
 
 <details>
 <summary><b>⚠ Se der erro: <code>ExpiredToken</code> no meio do apply</b></summary>
 <blockquote>
 
-A credencial do Academy venceu durante a execução. Renove-a (Passo 3) e rode `make apply` de novo: o Terraform já registrou o que conseguiu criar e continua de onde parou, sem duplicar recurso.
+A credencial do Academy venceu durante a execução. Copie uma nova para `~/.aws/credentials` (mesmo passo do pré-requisito, no topo do README) e rode `make apply` de novo: o Terraform já registrou o que conseguiu criar e continua de onde parou, sem duplicar recurso.
 
 Se o training job foi submetido antes do vencimento, ele continua rodando na AWS de forma independente — a credencial expirada só impede que **você** consulte o status, não que a AWS treine.
 
@@ -761,9 +799,9 @@ aws s3 rb "s3://$BUCKET"
 
 ---
 
-<a id="passo-14"></a>
+<a id="passo-11"></a>
 
-**14. Acompanhe o segundo estágio: o serving subindo**
+**11. Acompanhe o segundo estágio: o serving subindo**
 
 Ainda dentro do mesmo `make apply`, o segundo estágio começa:
 
@@ -815,9 +853,9 @@ Os 3m30s do Endpoint são o único item da lista que envolve provisionar hardwar
 
 ---
 
-<a id="passo-15"></a>
+<a id="passo-12"></a>
 
-**15. Leia as saídas do Terraform**
+**12. Leia as saídas do Terraform**
 
 Ao fim do `make apply`, o Terraform imprime as saídas. Elas são o inventário do que existe agora na sua conta:
 
@@ -853,7 +891,7 @@ training_job_name = "prb-cloud-ml-lab1-train-a1b2c3d4"
 training_output_uri = "s3://prb-cloud-ml-lab1-123456789012/output/training/"
 ```
 
-![](img/09-terraform-outputs.png)
+![](img/12-terraform-outputs.png)
 
 Três observações sobre o que **não** está aqui:
 
@@ -863,15 +901,15 @@ Três observações sobre o que **não** está aqui:
 
 ---
 
-<a id="passo-16"></a>
+<a id="passo-13"></a>
 
-**16. Confirme o training job no console da AWS**
+**13. Confirme o training job no console da AWS**
 
 Para ver o que o Terraform criou, abra o console do SageMaker e vá em [Training jobs](https://us-east-1.console.aws.amazon.com/sagemaker/home?region=us-east-1#/training).
 
 Você deve ver um job com o nome que apareceu na saída (`prb-cloud-ml-lab1-train-...`), com `Status: Completed`. Clique nele e observe duas seções.
 
-![](img/10-console-training-job.png)
+![](img/13-console-training-job.png)
 
 <details>
 <summary><b>⚠ Se der erro: <code>AccessDenied</code> ou a página do SageMaker não abre no Learner Lab</b></summary>
@@ -893,17 +931,36 @@ Nesse caso, capture o Print 10 a partir da saída deste comando no terminal.
 
 ---
 
-<a id="passo-17"></a>
+<a id="passo-14"></a>
 
-**17. Confirme o endpoint e o bucket**
+**14. Confirme o endpoint no console**
 
-Clique no link do console do SageMaker para ver os endpoints: [Endpoints](https://us-east-1.console.aws.amazon.com/sagemaker/home?region=us-east-1#/endpoints).
+Abra [Endpoints](https://us-east-1.console.aws.amazon.com/sagemaker/home?region=us-east-1#/endpoints) no console do SageMaker.
 
-![](img/11-console-endpoint-inservice.png)
+![](img/14-console-endpoint-inservice.png)
 
-![](img/11-console-endpoint-inservice2.png)
+![](img/14-console-endpoint-inservice-2.png)
 
-Devolta ao codespaces. No terminal, execute os comandos abaixo que mostram a organização do bucket, que conta a história do fluxo de dados:
+<details>
+<summary><b>⚠ Se der erro: <code>AccessDenied</code> ou a página não abre no Learner Lab</b></summary>
+<blockquote>
+
+O AWS Academy limita o que a interface do console permite. Se essa tela não abrir, confirme pela linha de comando, que consulta a mesma API que o console consultaria:
+
+```bash
+cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
+EP=$(terraform -chdir=terraform output -raw endpoint_name)
+aws sagemaker describe-endpoint --endpoint-name "$EP" --query '{status:EndpointStatus,name:EndpointName}'
+```
+
+</blockquote>
+</details>
+
+---
+
+<a id="passo-15"></a>
+
+**15. Confirme a organização do bucket**
 
 ```bash
 cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
@@ -920,9 +977,10 @@ metadata/dataset_manifest.json
 metadata/schema.json
 output/training/prb-cloud-ml-lab1-train-a1b2c3d4/output/model.tar.gz
 ```
-![](img/12-bucket-layout.png)
 
-Três prefixos, três papéis: `input/` é o que o treino leu, `metadata/` é o que descreve o dataset (manifesto com as impressões digitais e o esquema), e `output/` é o que o treino produziu. O `model.tar.gz` que está ali é o **mesmo** objeto que o endpoint carregou em memória no Passo 14.
+![](img/15-bucket-layout.png)
+
+Três prefixos, três papéis: `input/` é o que o treino leu, `metadata/` é o que descreve o dataset (manifesto com as impressões digitais e o esquema), e `output/` é o que o treino produziu. O `model.tar.gz` listado ali é o **mesmo** objeto que o endpoint carregou em memória no Passo 11.
 
 ### Checkpoint
 
@@ -941,9 +999,9 @@ Três prefixos, três papéis: `input/` é o que o treino leu, `metadata/` é o 
 
 Duas chamadas de fumaça com probabilidade coerente, os 600 clientes do conjunto de teste pontuados pelo endpoint, e um relatório de avaliação que aprova ou reprova o modelo contra critérios definidos **antes** de olhar o resultado.
 
-<a id="passo-18"></a>
+<a id="passo-16"></a>
 
-**18. Faça a primeira chamada real ao modelo**
+**16. Faça a primeira chamada real ao modelo**
 
 ```bash
 cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
@@ -966,7 +1024,7 @@ Saída esperada, com os números iguais aos seus:
 [PASS] smoke inference
 ```
 
-![](img/13-make-predict.png)
+![](img/16-make-predict.png)
 
 **Este é o momento em que a pergunta da Helena passa a ter resposta.** Ela perguntou "dado um cliente, qual é a probabilidade de ele cancelar?". A resposta é `0.964739`, entregue por um endpoint HTTPS que qualquer sistema autorizado pode chamar.
 
@@ -1001,7 +1059,7 @@ Note também que este laboratório usa limiar fixo em `0.5`, e o relatório de a
 
 Praticamente sempre é formato de payload. As duas causas:
 
-1. **Número de colunas errado.** O endpoint espera exatamente 7 valores, sem cabeçalho e sem rótulo. Reveja o Passo 8.
+1. **Número de colunas errado.** O endpoint espera exatamente 7 valores, sem cabeçalho e sem rótulo. Reveja o Passo 6.
 2. **Endpoint não está `InService`.** Confirme:
 
 ```bash
@@ -1017,11 +1075,11 @@ Se responder `Creating`, aguarde e tente de novo. Se responder `Failed`, rode `m
 
 ---
 
-<a id="passo-19"></a>
+<a id="passo-17"></a>
 
-**19. Pontue os 600 clientes que o modelo nunca viu**
+**17. Pontue os 600 clientes que o modelo nunca viu**
 
-Duas cehamadas provam qu o serviço responde. Elas não dizem se ele responde **bem**. Para isso existe o conjunto de teste, que ficou guardado desde o Passo 7 e nunca chegou perto do treino:
+Duas chamadas provam que o serviço responde. Elas não dizem se ele responde **bem**. Para isso existe o conjunto de teste, guardado desde o Passo 5 e que nunca chegou perto do treino:
 
 ```bash
 cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
@@ -1046,7 +1104,7 @@ Saída esperada:
 [evaluate] wrote .../artifacts/evidence/evaluation.json and evaluation.md
 ```
 
-![](img/14-make-evaluate.png)
+![](img/17-make-evaluate.png)
 
 Repare em `batch 1/2/3`: as 600 linhas não vão em uma chamada só, e sim em lotes de até 250. Isso não é limitação do laboratório, é como se conversa com um endpoint de tempo real — cada requisição tem limite de tamanho, e enviar de uma vez seria pedir para receber um erro de payload.
 
@@ -1065,9 +1123,9 @@ Duas implementações independentes concordando na sétima casa decimal é evid�
 
 ---
 
-<a id="passo-20"></a>
+<a id="passo-18"></a>
 
-**20. Leia o relatório de avaliação**
+**18. Leia o relatório de avaliação**
 
 ```bash
 cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
@@ -1146,9 +1204,9 @@ Os três limiares vivem em `config/lab.yaml` e foram escritos **antes** de qualq
 
 ---
 
-<a id="passo-21"></a>
+<a id="passo-19"></a>
 
-**21. Responda três perguntas antes de seguir**
+**19. Responda três perguntas antes de seguir**
 
 Pare aqui e responda, olhando o seu `evaluation.md`. Não é retórica: as três respostas aparecem em prova e em reunião.
 
@@ -1181,9 +1239,9 @@ Pare aqui e responda, olhando o seu `evaluation.md`. Não é retórica: as três
 
 Um arquivo `evidence.md` que prova, elo por elo, que a cadeia de capacidades está completa, e um `DECISION.md` escrito por você recomendando ou não o uso do modelo.
 
-<a id="passo-22"></a>
+<a id="passo-20"></a>
 
-**22. Gere o pacote de evidência**
+**20. Gere o pacote de evidência**
 
 ```bash
 cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
@@ -1205,13 +1263,13 @@ Saída esperada:
 
 Sete elos, sete verificações. Nenhuma delas lê um log ou confia em memória: cada uma consulta a AWS ou recalcula o valor.
 
-![](img/16-make-evidence.png)
+![](img/20-make-evidence.png)
 
 ---
 
-<a id="passo-23"></a>
+<a id="passo-21"></a>
 
-**23. Leia o dossiê**
+**21. Leia o dossiê**
 
 ```bash
 cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
@@ -1255,7 +1313,7 @@ Sem dossiê, a resposta é reconstruída de memória e de arquivos espalhados. C
 | Quanto ele vale? | Métricas e matriz de confusão, seção 6 |
 | Alguém verificou? | Sete linhas de veredito, seção 7 |
 
-Repare no `Existence proven by: s3:HeadObject before the Model was created`. Essa linha diz que a verificação aconteceu **antes** da criação do recurso que depende dela — ou seja, a ordem correta, e não uma conferência retroativa feita depois de tudo dar certo.
+A linha `Existence proven by: s3:HeadObject before the Model was created` diz que a verificação aconteceu **antes** da criação do recurso que depende dela: a ordem correta, não uma conferência retroativa feita depois de tudo dar certo.
 
 Isso é rastreabilidade, e ela vale mais do que qualquer casa decimal a mais no ROC-AUC.
 
@@ -1273,9 +1331,9 @@ Significa apenas que você tem alterações locais não commitadas no repositór
 
 ---
 
-<a id="passo-24"></a>
+<a id="passo-22"></a>
 
-**24. Escreva a sua recomendação**
+**22. Escreva a sua recomendação**
 
 Este é o entregável em que você deixa de ser executor de comandos. Crie o arquivo:
 
@@ -1319,10 +1377,10 @@ Zero recursos cobrando na sua conta, provado por comando e não por confiança.
 > [!CAUTION]
 > **Esta parte não é opcional.** O endpoint continua cobrando por hora enquanto existir, inclusive com o Codespaces desligado, inclusive com o navegador fechado, inclusive de madrugada. O crédito do Learner Lab é de US$ 50 e não é reposto.
 
-<a id="passo-25"></a>
+<a id="passo-23"></a>
 
-**25. Destrua tudo**
-Devolta ao code spaces. No terminal, rode:
+**23. Destrua tudo**
+
 ```bash
 cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
 make destroy
@@ -1336,7 +1394,7 @@ Destroy complete! Resources: 12 destroyed.
 
 Doze recursos: os nove do estágio 1 mais os três do estágio 2. O Terraform destrói na ordem inversa da criação, então o endpoint sai antes do bucket.
 
-![](img/17-make-destroy.png)
+![](img/23-make-destroy.png)
 
 <details>
 <summary><b>⚠ Se der erro: o destroy falha porque o bucket não está vazio</b></summary>
@@ -1358,16 +1416,16 @@ make destroy
 <summary><b>⚠ Se der erro: <code>ExpiredToken</code> durante o destroy</b></summary>
 <blockquote>
 
-**Este é o cenário mais perigoso do laboratório**, porque a credencial vencer no meio do destroy deixa o endpoint no ar cobrando. Renove a credencial (Passo 3) e rode `make destroy` de novo imediatamente. Depois, confirme com o Passo 26 — não presuma.
+**Este é o cenário mais perigoso do laboratório**, porque a credencial vencer no meio do destroy deixa o endpoint no ar cobrando. Renove a credencial em `~/.aws/credentials` e rode `make destroy` de novo imediatamente. Depois, confirme com o Passo 24, não presuma que deu certo.
 
 </blockquote>
 </details>
 
 ---
 
-<a id="passo-26"></a>
+<a id="passo-24"></a>
 
-**26. Prove que não sobrou nada cobrando**
+**24. Prove que não sobrou nada cobrando**
 
 `Destroy complete` é o Terraform contando o que **ele** acha que fez. A verificação independente é outra coisa:
 
@@ -1386,7 +1444,7 @@ Saída esperada:
 [PASS] verify-clean
 ```
 
-![](img/18-verify-clean.png)
+![](img/24-verify-clean.png)
 
 <details>
 <summary><b>💡 Clique para entender: por que verificar depois de destruir</b></summary>
@@ -1403,9 +1461,9 @@ A diferença entre "eu destruí" e "eu verifiquei que não existe" é a diferen�
 
 ---
 
-<a id="passo-27"></a>
+<a id="passo-25"></a>
 
-**27. Limpe os arquivos locais (opcional)**
+**25. Limpe os arquivos locais (opcional)**
 
 ```bash
 cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
@@ -1427,9 +1485,9 @@ Remove `artifacts/` e os caches do Python. **Nunca toca na AWS.** Só rode se vo
 
 ## Rodando o ciclo inteiro de novo
 
-<a id="passo-29"></a>
+<a id="passo-26"></a>
 
-**29. **Opcional** Repita tudo com um comando**
+**26. Repita tudo com um comando (opcional)**
 
 Agora que você executou cada etapa entendendo o que ela faz, vale ver o ciclo completo rodando de uma vez:
 
