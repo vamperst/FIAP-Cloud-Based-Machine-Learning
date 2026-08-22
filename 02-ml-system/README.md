@@ -246,16 +246,15 @@ O ambiente base já tem Terraform, AWS CLI, Python e `make`. Falta o que é excl
 bash scripts/setup.sh
 ```
 
-Saída esperada (leva de 40 a 90 segundos na primeira vez):
-
-```text
-==> terraform 1.15.8 já disponível
-==> criando .venv com as versões de requirements.txt
-==> terraform : Terraform v1.15.8
-==> python    : Python 3.12.14
-==> aws cli   : aws-cli/2.36.29 Python/3.14.6 Linux/6.12.76-linuxkit exe/aarch64.ubuntu.24
-==> pronto. Próximo passo: make doctor
-```
+> Saída esperada (leva de 40 a 90 segundos na primeira vez):
+> ```text
+> ==> terraform 1.15.8 já disponível
+> ==> criando .venv com as versões de requirements.txt
+> ==> terraform : Terraform v1.15.8
+> ==> python    : Python 3.12.14
+> ==> aws cli   : aws-cli/2.36.29 Python/3.14.6 Linux/6.12.76-linuxkit exe/aarch64.ubuntu.24
+> ==> pronto. Próximo passo: make doctor
+> ```
 
 
 
@@ -288,13 +287,12 @@ terraform version
 .venv/bin/python --version
 ```
 
-Saída esperada:
-
-```text
-Terraform v1.15.8
-on linux_amd64
-Python 3.12.14
-```
+> Saída esperada:
+> ```text
+> Terraform v1.15.8
+> on linux_amd64
+> Python 3.12.14
+> ```
 
 A segunda linha descreve a arquitetura da máquina e pode variar (`linux_amd64` no Codespaces, `linux_arm64` em Mac com Apple Silicon). As outras duas precisam bater — a versão de patch do Python pode variar dentro da série 3.12.
 
@@ -314,29 +312,28 @@ cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
 make help
 ```
 
-Saída esperada:
-
-```text
-Lab 1 - From Model to Machine Learning System
-
-  help           Show available targets
-  doctor         Check tool versions and AWS credentials/region/role
-  data           Generate the deterministic dataset
-  fmt            Format Terraform (check in CI, rewrite locally)
-  validate       terraform init + validate
-  plan           Plan the current stage
-  apply          Provision storage + training, then serving (single command, two stages)
-  predict        Deterministic smoke inference
-  evaluate       Score the held-out test set through the endpoint
-  evidence       Build the evidence package
-  destroy        Destroy every managed resource
-  verify-clean   Prove no billable serving resource remains
-  e2e            Full lifecycle with failure-safe cleanup (KEEP_RESOURCES=1 to skip destroy)
-  clean          Remove generated local artifacts (never touches AWS)
-
-  Full lifecycle:  make e2e
-  Keep resources:  make e2e KEEP_RESOURCES=1   (you must run make destroy later)
-```
+> Saída esperada:
+> ```text
+> Lab 1 - From Model to Machine Learning System
+>
+>   help           Show available targets
+>   doctor         Check tool versions and AWS credentials/region/role
+>   data           Generate the deterministic dataset
+>   fmt            Format Terraform (check in CI, rewrite locally)
+>   validate       terraform init + validate
+>   plan           Plan the current stage
+>   apply          Provision storage + training, then serving (single command, two stages)
+>   predict        Deterministic smoke inference
+>   evaluate       Score the held-out test set through the endpoint
+>   evidence       Build the evidence package
+>   destroy        Destroy every managed resource
+>   verify-clean   Prove no billable serving resource remains
+>   e2e            Full lifecycle with failure-safe cleanup (KEEP_RESOURCES=1 to skip destroy)
+>   clean          Remove generated local artifacts (never touches AWS)
+>
+>   Full lifecycle:  make e2e
+>   Keep resources:  make e2e KEEP_RESOURCES=1   (you must run make destroy later)
+> ```
 
 São 14 comandos, e é a lista inteira do laboratório. Nada acontece por baixo do pano: cada um deles é uma chamada de `terraform` ou de `python scripts/...` que você pode abrir e ler no `Makefile`.
 
@@ -376,24 +373,23 @@ Repare nas dependências: `apply` já roda `data` e `validate` sozinho, e `plan`
 make doctor
 ```
 
-Saída esperada (o número da conta é o da sua conta, e o `caller` traz o seu usuário do Academy):
-
-```text
-== tool versions ==
-Terraform v1.15.8
-on linux_amd64
-Python 3.12.11
-boto3 1.43.73 botocore 1.43.73 numpy 2.5.2 scikit-learn 1.9.0
-== aws preflight ==
-AWS preflight
-  account          : 123456789012
-  caller           : arn:aws:sts::1234****9012:assumed-role/voclabs/user1234567=
-  region           : us-east-1 (required us-east-1)
-  execution role   : arn:aws:iam::1234****9012:role/LabRole
-  lab bucket to use: prb-cloud-ml-lab1-123456789012
-  credentials are never printed by this lab
-[PASS] preflight
-```
+> Saída esperada (o número da conta é o da sua conta, e o `caller` traz o seu usuário do Academy):
+> ```text
+> == tool versions ==
+> Terraform v1.15.8
+> on linux_amd64
+> Python 3.12.11
+> boto3 1.43.73 botocore 1.43.73 numpy 2.5.2 scikit-learn 1.9.0
+> == aws preflight ==
+> AWS preflight
+>   account          : 123456789012
+>   caller           : arn:aws:sts::1234****9012:assumed-role/voclabs/user1234567=
+>   region           : us-east-1 (required us-east-1)
+>   execution role   : arn:aws:iam::1234****9012:role/LabRole
+>   lab bucket to use: prb-cloud-ml-lab1-123456789012
+>   credentials are never printed by this lab
+> [PASS] preflight
+> ```
 
 ![](img/04-make-doctor.png)
 
@@ -471,17 +467,16 @@ cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
 make data
 ```
 
-Saída esperada, literalmente igual à sua (com exceção do caminho, que traz o nome do seu fork):
-
-```text
-[data] seed=20260817 rows=4000 out=/workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system/artifacts/data
-[data] seed 20260817 schema 1.0.0
-[data] source 4000 rows, prevalence 0.3375
-[data] train       2800 rows  prevalence 0.3375  2013b9725797
-[data] validation   600 rows  prevalence 0.338333  18a0ddc5d4d8
-[data] test         600 rows  prevalence 0.336667  04c4fdee573f
-[data] written to /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system/artifacts/data
-```
+> Saída esperada, literalmente igual à sua (com exceção do caminho, que traz o nome do seu fork):
+> ```text
+> [data] seed=20260817 rows=4000 out=/workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system/artifacts/data
+> [data] seed 20260817 schema 1.0.0
+> [data] source 4000 rows, prevalence 0.3375
+> [data] train       2800 rows  prevalence 0.3375  2013b9725797
+> [data] validation   600 rows  prevalence 0.338333  18a0ddc5d4d8
+> [data] test         600 rows  prevalence 0.336667  04c4fdee573f
+> [data] written to /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system/artifacts/data
+> ```
 
 ![](img/05-make-data.png)
 
@@ -519,16 +514,15 @@ A relação entre as características e o cancelamento foi construída para ser 
 ls -la artifacts/data
 ```
 
-Saída esperada: seis arquivos.
-
-```text
-dataset_manifest.json
-model_test_features_headerless.csv
-model_train_headerless.csv
-model_validation_headerless.csv
-source.csv
-test_labels.csv
-```
+> Saída esperada: seis arquivos.
+> ```text
+> dataset_manifest.json
+> model_test_features_headerless.csv
+> model_train_headerless.csv
+> model_validation_headerless.csv
+> source.csv
+> test_labels.csv
+> ```
 
 Agora compare a **primeira linha** de três deles, porque a diferença entre eles é o conteúdo conceitual mais importante desta parte:
 
@@ -539,13 +533,12 @@ head -1 artifacts/data/model_train_headerless.csv
 head -1 artifacts/data/model_test_features_headerless.csv
 ```
 
-Saída esperada:
-
-```text
-observation_id,tenure_months,monthly_charges,support_calls_90d,payment_delay_days,usage_score,annual_contract,premium_plan,churn
-1,14,125.51,3,1.11,84.04,1,0
-15,87.81,1,10.45,70.33,1,0
-```
+> Saída esperada:
+> ```text
+> observation_id,tenure_months,monthly_charges,support_calls_90d,payment_delay_days,usage_score,annual_contract,premium_plan,churn
+> 1,14,125.51,3,1.11,84.04,1,0
+> 15,87.81,1,10.45,70.33,1,0
+> ```
 
 Três arquivos, três formatos, e cada um serve um propósito diferente:
 
@@ -603,18 +596,17 @@ cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
 PYTHONPATH=src .venv/bin/python scripts/validate_data.py > artifacts/contrato.json
 ```
 
-Saída esperada em tela (é longa; estas são a primeira e as últimas linhas):
-
-```text
-data contract: 48 checks against /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system/artifacts/data
-  [PASS] files.present: all 6 files present in ...
-  [PASS] schema.serving_contract: serving: {'content_type': 'text/csv', 'header': False, 'label_present': False, 'column_count': 7}
-  [PASS] schema.training_contract: training: {'content_type': 'text/csv', 'header': False, 'label_present': True, 'label_position': 'first', 'column_count': 8}
-  ...
-  [PASS] payload.roundtrip_matches_file: 600 rows re-serialise byte-identically
-  [PASS] payload.smoke_shape: smoke records ['high_risk', 'low_risk'] -> 2 lines of 7 columns
-[PASS] 0 of 48 checks failed
-```
+> Saída esperada em tela (é longa; estas são a primeira e as últimas linhas):
+> ```text
+> data contract: 48 checks against /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system/artifacts/data
+>   [PASS] files.present: all 6 files present in ...
+>   [PASS] schema.serving_contract: serving: {'content_type': 'text/csv', 'header': False, 'label_present': False, 'column_count': 7}
+>   [PASS] schema.training_contract: training: {'content_type': 'text/csv', 'header': False, 'label_present': True, 'label_position': 'first', 'column_count': 8}
+>   ...
+>   [PASS] payload.roundtrip_matches_file: 600 rows re-serialise byte-identically
+>   [PASS] payload.smoke_shape: smoke records ['high_risk', 'low_risk'] -> 2 lines of 7 columns
+> [PASS] 0 of 48 checks failed
+> ```
 
 ![](img/08-contrato-48-checks.png)
 
@@ -634,14 +626,13 @@ echo '9999,12,99.90,2,3.00,50.00,1,1,1' >> artifacts/data/source.csv
 PYTHONPATH=src .venv/bin/python scripts/validate_data.py > /dev/null
 ```
 
-Saída esperada (três reprovações, e o comando termina com código de erro):
-
-```text
-  [FAIL] source.row_count: 4001 rows, expected 4000
-  [FAIL] manifest.fingerprints_match_files: mismatched: ['source']
-  [FAIL] splits.partition_source: {'train': 2800, 'validation': 600, 'test': 600} sums to 4000 of 4001 source rows
-[FAIL] 3 of 48 checks failed
-```
+> Saída esperada (três reprovações, e o comando termina com código de erro):
+> ```text
+>   [FAIL] source.row_count: 4001 rows, expected 4000
+>   [FAIL] manifest.fingerprints_match_files: mismatched: ['source']
+>   [FAIL] splits.partition_source: {'train': 2800, 'validation': 600, 'test': 600} sums to 4000 of 4001 source rows
+> [FAIL] 3 of 48 checks failed
+> ```
 
 Uma linha a mais em um arquivo de 4.000 disparou três alarmes diferentes: a contagem não fecha, a impressão digital não corresponde mais ao que o manifesto registrou, e a soma das divisões deixou de cobrir a origem. Note que o contrato não sabe **o que** você fez, e ainda assim descreve o sintoma com precisão suficiente para o diagnóstico.
 
@@ -698,15 +689,17 @@ make plan
 
 A saída é longa porque descreve cada atributo de cada recurso. A linha que interessa está no fim:
 
-```text
-Plan: 9 to add, 0 to change, 0 to destroy.
-```
+> **Saída esperada:**
+> ```text
+> Plan: 9 to add, 0 to change, 0 to destroy.
+> ```
 
 Nove recursos, e nenhum deles é um endpoint. Confira também esta linha nas mudanças de saída:
 
-```text
-  + deploy_serving       = false
-```
+> **Saída esperada:**
+> ```text
+>   + deploy_serving       = false
+> ```
 
 Esse é o laboratório dizendo, em texto, que o estágio atual **não** inclui serving. Vale a pena passar os olhos nos nove recursos: um `random_id` (o sufixo do ciclo de vida), o bucket e suas quatro configurações de segurança, dois objetos de metadados, dois objetos de dados e o training job.
 
@@ -739,27 +732,29 @@ make apply
 
 A primeira coisa que aparece é o cabeçalho do estágio 1 e, no fim dele, a criação dos nove recursos:
 
-```text
-== stage 1/2: storage and training job ==
-...
-random_id.lifecycle: Creation complete after 0s [id=DKmJXQ]
-aws_s3_bucket.lab: Creation complete after 4s [id=prb-cloud-ml-lab1-123456789012]
-aws_s3_object.schema: Creation complete after 1s [id=.../metadata/schema.json]
-aws_s3_object.manifest: Creation complete after 1s [id=.../metadata/dataset_manifest.json]
-aws_s3_object.validation: Creation complete after 1s [id=.../input/validation/validation.csv]
-aws_s3_object.train: Creation complete after 1s [id=.../input/train/train.csv]
-aws_sagemaker_training_job.churn: Creation complete after 1s
-
-Apply complete! Resources: 9 added, 0 changed, 0 destroyed.
-```
+> **Saída esperada:**
+> ```text
+> == stage 1/2: storage and training job ==
+> ...
+> random_id.lifecycle: Creation complete after 0s [id=DKmJXQ]
+> aws_s3_bucket.lab: Creation complete after 4s [id=prb-cloud-ml-lab1-123456789012]
+> aws_s3_object.schema: Creation complete after 1s [id=.../metadata/schema.json]
+> aws_s3_object.manifest: Creation complete after 1s [id=.../metadata/dataset_manifest.json]
+> aws_s3_object.validation: Creation complete after 1s [id=.../input/validation/validation.csv]
+> aws_s3_object.train: Creation complete after 1s [id=.../input/train/train.csv]
+> aws_sagemaker_training_job.churn: Creation complete after 1s
+>
+> Apply complete! Resources: 9 added, 0 changed, 0 destroyed.
+> ```
 
 ![](img/12-make-apply.png)
 
 Repare em `aws_sagemaker_training_job.churn: Creation complete after 1s`. O Terraform criou o job em 1 segundo, mas o treino **não** terminou em 1 segundo. O que terminou foi a **submissão**: o Terraform pediu à AWS "comece a treinar" e a AWS respondeu "aceito". O treino roda de forma assíncrona, e é o portão entre os dois estágios que espera o resultado:
 
-```text
-[wait] Completed in 147s billable
-```
+> **Saída esperada:**
+> ```text
+> [wait] Completed in 147s billable
+> ```
 
 Essa linha (o número exato varia) é o portão confirmando que o treino terminou e provando o artefato com `HeadObject` antes de liberar o estágio 2. É isso que o próximo passo continua.
 
@@ -805,18 +800,19 @@ aws s3 rb "s3://$BUCKET"
 
 Ainda dentro do mesmo `make apply`, o segundo estágio começa:
 
-```text
-== stage 2/2: model, endpoint configuration and endpoint ==
-...
-aws_sagemaker_model.churn[0]: Creation complete after 2s [id=prb-cloud-ml-lab1-model-a1b2c3d4]
-aws_sagemaker_endpoint_configuration.churn[0]: Creation complete after 1s [id=prb-cloud-ml-lab1-epc-a1b2c3d4]
-aws_sagemaker_endpoint.churn[0]: Still creating... [00m10s elapsed]
-aws_sagemaker_endpoint.churn[0]: Still creating... [00m20s elapsed]
-...
-aws_sagemaker_endpoint.churn[0]: Creation complete after 3m30s [id=prb-cloud-ml-lab1-ep-a1b2c3d4]
-
-Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
-```
+> **Saída esperada:**
+> ```text
+> == stage 2/2: model, endpoint configuration and endpoint ==
+> ...
+> aws_sagemaker_model.churn[0]: Creation complete after 2s [id=prb-cloud-ml-lab1-model-a1b2c3d4]
+> aws_sagemaker_endpoint_configuration.churn[0]: Creation complete after 1s [id=prb-cloud-ml-lab1-epc-a1b2c3d4]
+> aws_sagemaker_endpoint.churn[0]: Still creating... [00m10s elapsed]
+> aws_sagemaker_endpoint.churn[0]: Still creating... [00m20s elapsed]
+> ...
+> aws_sagemaker_endpoint.churn[0]: Creation complete after 3m30s [id=prb-cloud-ml-lab1-ep-a1b2c3d4]
+>
+> Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
+> ```
 
 Três recursos, três tempos muito diferentes: o modelo em 2 segundos, a configuração em 1 segundo, o endpoint em **3 minutos e meio**. Essa assimetria conta o que cada um deles é.
 
@@ -859,37 +855,38 @@ Os 3m30s do Endpoint são o único item da lista que envolve provisionar hardwar
 
 Ao fim do `make apply`, o Terraform imprime as saídas. Elas são o inventário do que existe agora na sua conta:
 
-```text
-Outputs:
-
-account_id = "123456789012"
-bucket_name = "prb-cloud-ml-lab1-123456789012"
-deploy_serving = true
-endpoint_config_name = "prb-cloud-ml-lab1-epc-a1b2c3d4"
-endpoint_name = "prb-cloud-ml-lab1-ep-a1b2c3d4"
-execution_role_arn = "arn:aws:iam::123456789012:role/LabRole"
-hyperparameters = tomap({
-  "colsample_bytree" = "0.90"
-  "eta" = "0.10"
-  "eval_metric" = "auc"
-  "max_depth" = "4"
-  "num_round" = "50"
-  "objective" = "binary:logistic"
-  "subsample" = "0.90"
-  "verbosity" = "1"
-})
-instance_type = "ml.m5.large"
-model_artifact_uri = "s3://prb-cloud-ml-lab1-123456789012/output/training/prb-cloud-ml-lab1-train-a1b2c3d4/output/model.tar.gz"
-model_name = "prb-cloud-ml-lab1-model-a1b2c3d4"
-region = "us-east-1"
-training_channels = {
-  "train" = "s3://prb-cloud-ml-lab1-123456789012/input/train/"
-  "validation" = "s3://prb-cloud-ml-lab1-123456789012/input/validation/"
-}
-training_image = "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:1.7-1"
-training_job_name = "prb-cloud-ml-lab1-train-a1b2c3d4"
-training_output_uri = "s3://prb-cloud-ml-lab1-123456789012/output/training/"
-```
+> **Saída esperada:**
+> ```text
+> Outputs:
+>
+> account_id = "123456789012"
+> bucket_name = "prb-cloud-ml-lab1-123456789012"
+> deploy_serving = true
+> endpoint_config_name = "prb-cloud-ml-lab1-epc-a1b2c3d4"
+> endpoint_name = "prb-cloud-ml-lab1-ep-a1b2c3d4"
+> execution_role_arn = "arn:aws:iam::123456789012:role/LabRole"
+> hyperparameters = tomap({
+>   "colsample_bytree" = "0.90"
+>   "eta" = "0.10"
+>   "eval_metric" = "auc"
+>   "max_depth" = "4"
+>   "num_round" = "50"
+>   "objective" = "binary:logistic"
+>   "subsample" = "0.90"
+>   "verbosity" = "1"
+> })
+> instance_type = "ml.m5.large"
+> model_artifact_uri = "s3://prb-cloud-ml-lab1-123456789012/output/training/prb-cloud-ml-lab1-train-a1b2c3d4/output/model.tar.gz"
+> model_name = "prb-cloud-ml-lab1-model-a1b2c3d4"
+> region = "us-east-1"
+> training_channels = {
+>   "train" = "s3://prb-cloud-ml-lab1-123456789012/input/train/"
+>   "validation" = "s3://prb-cloud-ml-lab1-123456789012/input/validation/"
+> }
+> training_image = "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:1.7-1"
+> training_job_name = "prb-cloud-ml-lab1-train-a1b2c3d4"
+> training_output_uri = "s3://prb-cloud-ml-lab1-123456789012/output/training/"
+> ```
 
 ![](img/12-terraform-outputs.png)
 
@@ -968,15 +965,14 @@ BUCKET=$(terraform -chdir=terraform output -raw bucket_name)
 aws s3 ls "s3://$BUCKET" --recursive --human-readable
 ```
 
-Saída esperada (o sufixo do job é o seu):
-
-```text
-input/train/train.csv
-input/validation/validation.csv
-metadata/dataset_manifest.json
-metadata/schema.json
-output/training/prb-cloud-ml-lab1-train-a1b2c3d4/output/model.tar.gz
-```
+> Saída esperada (o sufixo do job é o seu):
+> ```text
+> input/train/train.csv
+> input/validation/validation.csv
+> metadata/dataset_manifest.json
+> metadata/schema.json
+> output/training/prb-cloud-ml-lab1-train-a1b2c3d4/output/model.tar.gz
+> ```
 
 ![](img/15-bucket-layout.png)
 
@@ -1008,21 +1004,20 @@ cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
 make predict
 ```
 
-Saída esperada, com os números iguais aos seus:
-
-```text
-[predict] endpoint prb-cloud-ml-lab1-ep-a1b2c3d4 (InService)
-[predict] feature order: tenure_months, monthly_charges, support_calls_90d, payment_delay_days, usage_score, annual_contract, premium_plan
-[predict] request high_risk: 2,220.00,6,30.00,15.00,0,0
-[predict] request low_risk: 66,45.00,0,0.00,92.00,1,1
-[predict] response high_risk: p(churn)=0.964739
-[predict] response low_risk: p(churn)=0.017099
-  [PASS] all_finite
-  [PASS] all_in_unit_interval
-  [PASS] one_probability_per_row
-  [PASS] high_risk_scored_above_low_risk
-[PASS] smoke inference
-```
+> Saída esperada, com os números iguais aos seus:
+> ```text
+> [predict] endpoint prb-cloud-ml-lab1-ep-a1b2c3d4 (InService)
+> [predict] feature order: tenure_months, monthly_charges, support_calls_90d, payment_delay_days, usage_score, annual_contract, premium_plan
+> [predict] request high_risk: 2,220.00,6,30.00,15.00,0,0
+> [predict] request low_risk: 66,45.00,0,0.00,92.00,1,1
+> [predict] response high_risk: p(churn)=0.964739
+> [predict] response low_risk: p(churn)=0.017099
+>   [PASS] all_finite
+>   [PASS] all_in_unit_interval
+>   [PASS] one_probability_per_row
+>   [PASS] high_risk_scored_above_low_risk
+> [PASS] smoke inference
+> ```
 
 ![](img/16-make-predict.png)
 
@@ -1086,23 +1081,22 @@ cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
 make evaluate
 ```
 
-Saída esperada:
-
-```text
-[evaluate] scoring 600 held-out rows through prb-cloud-ml-lab1-ep-a1b2c3d4
-[evaluate] batch 1: 250/600 rows scored
-[evaluate] batch 2: 500/600 rows scored
-[evaluate] batch 3: 600/600 rows scored
-[evaluate] majority baseline accuracy 0.6633
-[evaluate] accuracy 0.7617 (lift +0.0983)
-[evaluate] precision 0.6746 recall 0.5644 f1 0.6146
-[evaluate] roc_auc 0.8142 pr_auc 0.6994
-  [PASS] roc_auc_min: 0.81417 vs 0.75
-  [PASS] f1_min: 0.614555 vs 0.5
-  [PASS] beats_majority_accuracy: 0.761667 vs 0.663333
-  [PASS] metrics agree with scikit-learn
-[evaluate] wrote .../artifacts/evidence/evaluation.json and evaluation.md
-```
+> Saída esperada:
+> ```text
+> [evaluate] scoring 600 held-out rows through prb-cloud-ml-lab1-ep-a1b2c3d4
+> [evaluate] batch 1: 250/600 rows scored
+> [evaluate] batch 2: 500/600 rows scored
+> [evaluate] batch 3: 600/600 rows scored
+> [evaluate] majority baseline accuracy 0.6633
+> [evaluate] accuracy 0.7617 (lift +0.0983)
+> [evaluate] precision 0.6746 recall 0.5644 f1 0.6146
+> [evaluate] roc_auc 0.8142 pr_auc 0.6994
+>   [PASS] roc_auc_min: 0.81417 vs 0.75
+>   [PASS] f1_min: 0.614555 vs 0.5
+>   [PASS] beats_majority_accuracy: 0.761667 vs 0.663333
+>   [PASS] metrics agree with scikit-learn
+> [evaluate] wrote .../artifacts/evidence/evaluation.json and evaluation.md
+> ```
 
 ![](img/17-make-evaluate.png)
 
@@ -1248,18 +1242,17 @@ cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
 make evidence
 ```
 
-Saída esperada:
-
-```text
-  [PASS] storage: dataset generated and fingerprinted
-  [PASS] storage: training channels proven in S3
-  [PASS] training: job reached Completed
-  [PASS] artifact: model.tar.gz proven in S3
-  [PASS] serving: endpoint InService
-  [PASS] serving: deterministic smoke inference passed
-  [PASS] evidence: test-set metrics meet acceptance
-[PASS] evidence chain -> .../artifacts/evidence/evidence.md
-```
+> Saída esperada:
+> ```text
+>   [PASS] storage: dataset generated and fingerprinted
+>   [PASS] storage: training channels proven in S3
+>   [PASS] training: job reached Completed
+>   [PASS] artifact: model.tar.gz proven in S3
+>   [PASS] serving: endpoint InService
+>   [PASS] serving: deterministic smoke inference passed
+>   [PASS] evidence: test-set metrics meet acceptance
+> [PASS] evidence chain -> .../artifacts/evidence/evidence.md
+> ```
 
 Sete elos, sete verificações. Nenhuma delas lê um log ou confia em memória: cada uma consulta a AWS ou recalcula o valor.
 
@@ -1386,11 +1379,10 @@ cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
 make destroy
 ```
 
-Leva de 2 a 4 minutos, e a maior parte é o endpoint sendo desligado. Saída esperada no fim:
-
-```text
-Destroy complete! Resources: 12 destroyed.
-```
+> Leva de 2 a 4 minutos, e a maior parte é o endpoint sendo desligado. Saída esperada no fim:
+> ```text
+> Destroy complete! Resources: 12 destroyed.
+> ```
 
 Doze recursos: os nove do estágio 1 mais os três do estágio 2. O Terraform destrói na ordem inversa da criação, então o endpoint sai antes do bucket.
 
@@ -1434,15 +1426,14 @@ cd /workspaces/FIAP-Cloud-Based-Machine-Learning/02-ml-system
 make verify-clean
 ```
 
-Saída esperada:
-
-```text
-  [PASS] no endpoints for this lab
-  [PASS] no endpoint configs for this lab
-  [PASS] no models for this lab
-  [PASS] no lab bucket
-[PASS] verify-clean
-```
+> Saída esperada:
+> ```text
+>   [PASS] no endpoints for this lab
+>   [PASS] no endpoint configs for this lab
+>   [PASS] no models for this lab
+>   [PASS] no lab bucket
+> [PASS] verify-clean
+> ```
 
 ![](img/24-verify-clean.png)
 
