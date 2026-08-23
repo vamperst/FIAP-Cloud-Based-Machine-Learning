@@ -1,3 +1,11 @@
+<!--
+CONVENÇÃO DE PRINTS DESTE README (nota para o professor, não aparece renderizada)
+
+Cada bloco "> 📸 Print NN" abaixo marca o lugar exato onde a imagem entra, com o que
+capturar e o que aquela imagem prova. Depois de salvar o arquivo em `img/`, troque o
+bloco pela linha de imagem que está comentada logo abaixo dele.
+-->
+
 # 03 - Serving and Scaling
 
 Antes de começar, o setup do ambiente é o [Lab 01 - Setup e configuração de ambiente](../01-create-codespaces/README.md). O [Lab 02 - Do modelo ao sistema de Machine Learning](../02-ml-system/README.md) é a referência conceitual deste laboratório (o mesmo padrão de dois estágios, o mesmo jeito de ler o artefato pela API), mas este lab **não depende de nenhum arquivo runtime do Lab 02**: ele gera o próprio treino do zero.
@@ -35,7 +43,7 @@ Um único modelo servido por três endpoints simultâneos (real-time, serverless
 Um único `model.tar.gz` sai do training job de bootstrap e alimenta quatro formas de consumo: o Real-Time Endpoint (instância sempre ligada), o Serverless Endpoint (capacidade gerenciada pela AWS), o Async Endpoint (fila via S3, pode ir a zero) e um Batch Transform Job (computação efêmora, sem endpoint). Application Auto Scaling e CloudWatch (linhas tracejadas) cuidam da elasticidade do Real-Time e do Async: são observabilidade, não o caminho do dado. Fonte editável em [`diagramas/arquitetura.excalidraw`](diagramas/arquitetura.excalidraw).
 
 > [!TIP]
-> Os blocos **💡 Clique para entender** são aprofundamentos opcionais. Os blocos **⚠ Se der erro** aparecem logo depois do passo que pode falhar. Os blocos **📸 Print obrigatório** marcam onde salvar evidência visual em `img/`; guarde-os para a sua entrega/portfólio, mesmo que a prova oficial do lab seja sempre a API.
+> Os blocos **💡 Clique para entender** são aprofundamentos opcionais. Os blocos **⚠ Se der erro** aparecem logo depois do passo que pode falhar.
 
 ## Mapa do lab
 
@@ -274,7 +282,8 @@ make doctor
 > [PASS] preflight
 > ```
 
-> 📸 **Print obrigatório** — salve como `img/01-make-doctor.png`. Capture o terminal com as quatro linhas `_reachable : ok` e a linha final `[PASS] preflight`: é a prova de que o ambiente está pronto antes de qualquer custo.
+> 📸 Print 01 — capture o terminal com as quatro linhas `_reachable : ok` e a linha final `[PASS] preflight`: mostra ao aluno que o ambiente está pronto antes de qualquer custo.
+<!-- ![](img/01-make-doctor.png) -->
 
 <details>
 <summary><b>⚠ Se der erro: <code>ExpiredToken</code> ou credencial rejeitada</b></summary>
@@ -349,7 +358,8 @@ make data
 > [data] written to /workspaces/FIAP-Cloud-Based-Machine-Learning/03-serving-and-scaling/artifacts/data
 > ```
 
-> 📸 **Print obrigatório** — salve como `img/02-make-data.png`. Capture as três linhas `train`/`validation`/`test` com as contagens e a prevalência: é o valor que o Passo 7 vai conferir contra o hash.
+> 📸 Print 02 — capture as três linhas `train`/`validation`/`test` com as contagens e a prevalência.
+<!-- ![](img/02-make-data.png) -->
 
 <details>
 <summary><b>💡 Clique para entender: por que este dataset é diferente do Lab 02</b></summary>
@@ -412,7 +422,8 @@ make validate-data
 > async_payload.csv  ca70dcbed6bcef920906ccbe1b4e364c39c5c59702f214d892c21778e5ddf49d
 > ```
 
-> 📸 **Print obrigatório** — salve como `img/03-contrato-13-checks.png`. Capture os 13 `[PASS]` e a linha final `[PASS] data contract`.
+> 📸 Print 03 — capture os 13 `[PASS]` e a linha final `[PASS] data contract`.
+<!-- ![](img/03-contrato-13-checks.png) -->
 
 `test_features.csv` e `batch_input.csv` têm o mesmo hash de propósito: são o mesmo conjunto de 600 linhas de teste, usado por dois canais diferentes (invocação direta vs. transform job).
 
@@ -542,7 +553,8 @@ make apply
 > Apply complete! Resources: 13 added, 0 changed, 0 destroyed.
 > ```
 
-> 📸 **Print obrigatório** — salve como `img/04-make-apply.png`. Capture o `Apply complete!` do estágio 2 e as três linhas `Creation complete` dos endpoints: é a prova de que os três subiram na mesma execução.
+> 📸 Print 04 — capture o `Apply complete!` do estágio 2 e as três linhas `Creation complete` dos endpoints.
+<!-- ![](img/04-make-apply.png) -->
 
 Repare que o job de treino é criado em 1 segundo, mas o treino em si não termina em 1 segundo: o Terraform submete o job, e é o portão (`wait-training` dentro de `make apply`) que espera o resultado real e prova o artefato antes do segundo estágio.
 
@@ -654,7 +666,8 @@ echo "$JSON" | python3 -m json.tool 2>/dev/null | head -20
 
 Se preferir ver com os próprios olhos, abra o console do SageMaker em [Endpoints](https://us-east-1.console.aws.amazon.com/sagemaker/home?region=us-east-1#/endpoints) — você deve ver três endpoints com o prefixo `prb-cloud-ml-lab2`, todos `InService`. A prova que o lab usa para seguir em frente continua sendo a saída do Passo 11.
 
-> 📸 **Print obrigatório** — salve como `img/05-console-endpoints.png`. Capture a lista do console com os três endpoints e a coluna `Status` mostrando `InService` nos três.
+> 📸 Print 05 — capture a lista do console com os três endpoints e a coluna `Status` mostrando `InService` nos três.
+<!-- ![](img/05-console-endpoints.png) -->
 
 ### Checkpoint
 
@@ -687,7 +700,8 @@ make compare
 > [compare] predictions_match=True (tolerance 1e-06)
 > ```
 
-> 📸 **Print obrigatório** — salve como `img/06-make-compare.png`. Capture as duas linhas `first`/`warm_p50`/`warm_p95` e a linha `predictions_match=True`.
+> 📸 Print 06 — capture as linhas `first`/`warm_p50`/`warm_p95` dos dois modos e a linha `predictions_match=True`.
+<!-- ![](img/06-make-compare.png) -->
 
 `predictions_match=True` é o que importa mais do que os milissegundos: prova que o mesmo artefato responde igual nos dois modos. A diferença de latência entre `first` (6,4s) e `warm_p50` (472ms) no serverless é o comportamento de "primeira chamada" que a Helena precisa entender antes de escolher esse modo para o app: depois de aquecido, o serverless anda junto com o real-time; a conta chega inteira só na primeira invocação depois de um período ocioso.
 
@@ -761,7 +775,8 @@ make async
 > [async] input_count=50 output_count=50
 > ```
 
-> 📸 **Print obrigatório** — salve como `img/07-make-async.png`. Capture o `InferenceId`, o `output` e a linha `input_count=50 output_count=50`.
+> 📸 Print 07 — capture o `InferenceId`, o `output` e a linha `input_count=50 output_count=50`.
+<!-- ![](img/07-make-async.png) -->
 
 O `InferenceId` e o `output` location vêm da própria chamada `InvokeEndpointAsync`; o lab nunca monta esse caminho por convenção.
 
@@ -841,7 +856,8 @@ Mecânica: sobe `batch_input.csv` (as mesmas 600 linhas de `test_features.csv`) 
 > [batch] output_count=600 duration_observed=119.725s
 > ```
 
-> 📸 **Print obrigatório** — salve como `img/08-make-batch.png`. Capture o `Completed` e a linha `output_count=600`.
+> 📸 Print 08 — capture o `Completed` e a linha `output_count=600`.
+<!-- ![](img/08-make-batch.png) -->
 
 <details>
 <summary><b>⚠ Se der erro: job de transform ficando muito tempo em <code>InProgress</code></b></summary>
@@ -894,7 +910,8 @@ make load
 > [load] concurrency=8   requests=120  success_rate=1.0 p50=435.739ms p95=464.961ms rps=17.82
 > ```
 
-> 📸 **Print obrigatório** — salve como `img/09-make-load.png`. Capture os três níveis com `success_rate`/`p50`/`p95`/`rps`.
+> 📸 Print 09 — capture os três níveis com `success_rate`/`p50`/`p95`/`rps`.
+<!-- ![](img/09-make-load.png) -->
 
 O critério de aprovação é `success_rate >= 0.99` em todos os níveis; a latência é registrada, não comparada contra um número fixo.
 
@@ -945,7 +962,8 @@ make scale-demo
 > [scale] restored: 1
 > ```
 
-> 📸 **Print obrigatório** — salve como `img/10-make-scale-demo.png`. Capture as três linhas `before`/`scaled`/`restored`: é a prova do 1→2→1.
+> 📸 Print 10 — capture as três linhas `before`/`scaled`/`restored`, a prova do 1→2→1.
+<!-- ![](img/10-make-scale-demo.png) -->
 
 A espera de cada transição pode variar; o timeout é de até 600 segundos por transição.
 
@@ -1015,7 +1033,8 @@ make evidence
 > [evidence] chain_complete=True
 > ```
 
-> 📸 **Print obrigatório** — salve como `img/11-make-evidence.png`. Capture a linha `chain_complete=True`.
+> 📸 Print 11 — capture a linha `chain_complete=True`.
+<!-- ![](img/11-make-evidence.png) -->
 
 O `chain_complete` só fica `True` se **todas** as afirmações anteriores (treino completo, três endpoints `InService`, predictions equivalentes, async e batch corretos, load acima de 99%, scale-demo 1→2→1) ainda se sustentarem numa consulta fresca à API, não um checklist marcado de memória.
 
@@ -1083,7 +1102,8 @@ make destroy
 > Destroy complete! Resources: 22 destroyed.
 > ```
 
-> 📸 **Print obrigatório** — salve como `img/12-make-destroy.png`. Capture a linha `Destroy complete! Resources: 22 destroyed.`.
+> 📸 Print 12 — capture a linha `Destroy complete! Resources: 22 destroyed.`.
+<!-- ![](img/12-make-destroy.png) -->
 
 Vinte e dois: os nove do estágio 1 (bucket, suas três configurações de segurança, quatro objetos S3 e o training job) mais os treze do estágio 2 (model, três endpoint configs, três endpoints, dois scalable targets, três políticas de scaling e um alarme). O Terraform destrói na ordem inversa da criação: os endpoints e políticas de scaling saem antes do bucket.
 
@@ -1146,7 +1166,8 @@ make verify-clean
 > [PASS] verify-clean
 > ```
 
-> 📸 **Print obrigatório** — salve como `img/13-verify-clean.png`. Capture os oito `[PASS]` e a linha final `[PASS] verify-clean` — é o fechamento do lab, guarde este print para a entrega.
+> 📸 Print 13 — capture os oito `[PASS]` e a linha final `[PASS] verify-clean`, o fechamento do lab.
+<!-- ![](img/13-verify-clean.png) -->
 
 Este comando **não olha o state do Terraform**: ele pergunta direto às APIs se sobrou endpoint, config, modelo, scalable target, política, alarme ou bucket com o prefixo `prb-cloud-ml-lab2`. Um training/transform job antigo com status `Completed` pode continuar listado — isso não é falha, porque não é um recurso ativo faturável.
 
