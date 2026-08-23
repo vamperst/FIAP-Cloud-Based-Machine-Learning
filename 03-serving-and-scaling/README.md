@@ -164,6 +164,15 @@ O ambiente base do Codespaces já traz Terraform (ver [Lab 01](../01-create-code
 </blockquote>
 </details>
 
+<details>
+<summary><b>💡 Clique para entender: o que <code>make setup</code> faz de verdade</b></summary>
+<blockquote>
+
+`scripts/setup.sh` faz duas coisas, nesta ordem: confere se o `terraform` já está no `PATH` (se não estiver, para com uma mensagem clara em vez de tentar instalar algo); e cria (ou reaproveita, se já existir) o `.venv` deste lab e roda `pip install -r requirements.txt`, que trava boto3/botocore/numpy/scikit-learn/PyYAML nas versões exatas testadas. É idempotente: rodar de novo não reinstala o que já está na versão certa, só confirma.
+
+</blockquote>
+</details>
+
 ---
 
 <a id="passo-4"></a>
@@ -347,6 +356,17 @@ A prevalência de churn (~34,5%) e a separação das classes foram calibradas pa
 </blockquote>
 </details>
 
+<details>
+<summary><b>💡 Clique para entender: como <code>make data</code> gera e divide as 4.000 linhas</b></summary>
+<blockquote>
+
+`make_classification` cria as 4.000 linhas de uma vez (`weights=[0.66, 0.34]` fixa a prevalência, `class_sep=1.6` calibra a dificuldade). Depois, dois `train_test_split` estratificados em sequência: o primeiro separa 2.800 linhas de treino do restante; o segundo divide o restante em 600 de validação e 600 de teste. Estratificado significa que a proporção de churn é preservada nas três partes, não só na base inteira.
+
+A partir das mesmas 600 linhas de teste, o script grava **três arquivos diferentes**, cada um no formato que o consumidor exige: `test_labeled.csv` (com `id` e rótulo, para você auditar), `test_features.csv` (sem rótulo, para `compare`/`load`) e `batch_input.csv` (sem rótulo, para o Passo 17): os dois últimos têm o mesmo conteúdo e por isso o mesmo hash SHA-256 no Passo 7. `async_payload.csv` é só as primeiras 50 linhas de `test_features.csv`.
+
+</blockquote>
+</details>
+
 ---
 
 <a id="passo-7"></a>
@@ -385,6 +405,15 @@ make validate-data
 > ```
 
 `test_features.csv` e `batch_input.csv` têm o mesmo hash de propósito: são o mesmo conjunto de 600 linhas de teste, usado por dois canais diferentes (invocação direta vs. transform job).
+
+<details>
+<summary><b>💡 Clique para entender: como o contrato confere os 13 checks</b></summary>
+<blockquote>
+
+O contrato roda inteiro na sua máquina, sem custo. Três grupos de verificação: **contagem/formato** (número exato de linhas e colunas de cada arquivo, rótulo só com 0/1, nenhum `NaN`/`inf`); **integridade** (recalcula o SHA-256 de cada arquivo e compara com o que está gravado em `dataset_manifest.json`, gerado no Passo 6; se alguém editar um CSV à mão, falha aqui); e **vazamento de rótulo**, o mais importante: ele compara, valor a valor, as características de `test_labeled.csv` (que tem o rótulo) contra `test_features.csv` (que não tem) — se a ordem das colunas tivesse mudado ou o rótulo tivesse vazado para o arquivo de inferência, essa comparação reprovaria em vez de deixar passar um número plausível e errado.
+
+</blockquote>
+</details>
 
 ---
 
@@ -447,6 +476,15 @@ make plan
 Nove recursos no primeiro estágio, nenhum deles um endpoint: o bucket e suas quatro configurações de segurança, dois objetos de metadados, dois objetos de dados e o training job.
 
 <details>
+<summary><b>💡 Clique para entender: como <code>make plan</code> descobre o que vai mudar</b></summary>
+<blockquote>
+
+`plan` primeiro roda `validate-data` e `validate` (que fazem `terraform init` + `fmt -check` + `validate`), depois `terraform plan -input=false`. Nenhuma chamada de criação acontece: o Terraform lê o `.tf` do repositório, compara com o que está gravado no `terraform.tfstate` local e, para cada recurso, consulta a API da AWS para confirmar que a realidade bate com o state. A diferença entre os três (código, state, realidade) é o que aparece como `+`/`-`/`~` na saída. Como a variável `deploy_serving` está em `false` por padrão (nenhum handoff ainda existe), o plano nem tenta descrever o Model ou os Endpoints — eles só entram no gráfico de recursos quando essa variável vira `true`, no estágio 2 do `make apply`.
+
+</blockquote>
+</details>
+
+<details>
 <summary><b>⚠ Se der erro: <code>plan</code> quer recriar o serving a partir de um <code>artifact.auto.tfvars.json</code> velho</b></summary>
 <blockquote>
 
@@ -495,6 +533,22 @@ make apply
 > ```
 
 Repare que o job de treino é criado em 1 segundo, mas o treino em si não termina em 1 segundo: o Terraform submete o job, e é o portão (`wait-training` dentro de `make apply`) que espera o resultado real e prova o artefato antes do segundo estágio.
+
+<details>
+<summary><b>💡 Clique para entender: a mecânica exata do handoff entre os dois estágios</b></summary>
+<blockquote>
+
+`make apply` não é um só `terraform apply`, são dois, com um script Python no meio, tudo dentro do mesmo comando:
+
+1. `rm -f terraform/artifact.auto.tfvars.json`: apaga qualquer handoff de um ciclo anterior.
+2. `terraform apply -var deploy_serving=false`: estágio 1. Cria o bucket, os objetos de dados e o `aws_sagemaker_training_job`. Esse recurso retorna assim que a AWS aceita o job (`InProgress`), não quando ele termina.
+3. `scripts/lab.py wait-training`: faz `DescribeTrainingJob` em loop (a cada 20s) até o status virar `Completed`. Só então lê `ModelArtifacts.S3ModelArtifacts` da própria resposta da API, faz um `HeadObject` nesse URI exato para confirmar que o arquivo existe de verdade, e escreve `terraform/artifact.auto.tfvars.json` com `deploy_serving=true` e a URI provada.
+4. `terraform apply` (sem `-var`, desta vez lendo o `.auto.tfvars.json` do passo 3): estágio 2. Cria o `Model` (apontando para a URI provada), as três `EndpointConfiguration`, os três `Endpoint` e toda a Application Auto Scaling — o Terraform sobe os três endpoints em paralelo, por isso os tempos de criação aparecem intercalados na saída.
+
+Nunca existe um momento em que o Terraform "adivinha" o caminho do artefato: cada estágio só lê o que o estágio anterior provou.
+
+</blockquote>
+</details>
 
 <details>
 <summary><b>💡 Clique para entender: por que um único Model alimenta três endpoints</b></summary>
@@ -561,6 +615,15 @@ make status
 
 `current_instance_count: 0` no serverless não é erro: esse modo não mantém instância provisionada entre chamadas, é exatamente o ponto do Passo 13.
 
+<details>
+<summary><b>💡 Clique para entender: de onde <code>make status</code> tira cada valor</b></summary>
+<blockquote>
+
+Nenhum valor vem do Terraform ou de arquivo local. Para cada um dos três endpoints, o comando chama `DescribeEndpoint` (status e `CurrentInstanceCount`); para o real-time e o async, chama também `DescribeScalableTargets` e `DescribeScalingPolicies` do Application Auto Scaling, filtrando pelo `resource_id` daquele endpoint (`endpoint/<nome>/variant/AllTraffic`). É só leitura: nada aqui cria, altera ou destrói recurso, por isso pode ser rodado quantas vezes quiser sem custo nem risco.
+
+</blockquote>
+</details>
+
 ---
 
 <a id="passo-12"></a>
@@ -607,6 +670,15 @@ make compare
 > ```
 
 `predictions_match=True` é o que importa mais do que os milissegundos: prova que o mesmo artefato responde igual nos dois modos. A diferença de latência entre `first` (6,4s) e `warm_p50` (472ms) no serverless é o comportamento de "primeira chamada" que a Helena precisa entender antes de escolher esse modo para o app: depois de aquecido, o serverless anda junto com o real-time; a conta chega inteira só na primeira invocação depois de um período ocioso.
+
+<details>
+<summary><b>💡 Clique para entender: como <code>make compare</code> mede e compara</b></summary>
+<blockquote>
+
+O comando pega uma lista fixa de 5 linhas de `test_features.csv` (as mesmas para os dois modos) e monta um único payload CSV com as 5. Para cada endpoint: faz **1 chamada isolada** e cronometra só ela (`first_ms`); depois faz **20 chamadas sequenciais** com o mesmo payload e guarda cada tempo de resposta, do qual calcula p50 e p95 por interpolação linear entre as amostras ordenadas. Ao final, compara as predictions da última chamada de cada modo, posição a posição, com tolerância `1e-6` — se qualquer par diferir mais que isso, `predictions_match` vira `False` e o comando termina com erro.
+
+</blockquote>
+</details>
 
 <details>
 <summary><b>💡 Clique para entender: por que nenhum número de latência é critério de aprovação</b></summary>
@@ -670,6 +742,17 @@ make async
 O `InferenceId` e o `output` location vêm da própria chamada `InvokeEndpointAsync`; o lab nunca monta esse caminho por convenção.
 
 <details>
+<summary><b>💡 Clique para entender: o que acontece entre o upload e o output aparecer</b></summary>
+<blockquote>
+
+Quatro passos, todos dentro de `make async`: (1) sobe `async_payload.csv` (50 linhas) para um caminho novo no S3, com o timestamp no nome do arquivo, para não colidir com uma execução anterior; (2) chama `InvokeEndpointAsync` passando esse URI como `InputLocation` — a chamada retorna **na hora**, com um `InferenceId` e a `OutputLocation` onde o resultado vai aparecer, mas a inferência ainda não rodou; (3) faz `HeadObject` em loop nesse exato `OutputLocation` (nunca um caminho montado à mão) até o objeto existir, com timeout de 600s; (4) baixa o conteúdo e conta quantas predictions vieram, comparando com as 50 linhas que subiram.
+
+O ganho de arquitetura está no passo 2: quem chamou não fica esperando a resposta HTTP como no real-time; só recebe um "protocolo" (onde buscar o resultado) e segue a vida.
+
+</blockquote>
+</details>
+
+<details>
 <summary><b>⚠ Se der erro: tempo esgotado esperando o output no S3</b></summary>
 <blockquote>
 
@@ -710,6 +793,17 @@ make batch
 
 > [!IMPORTANT]
 > Este comando cria um `TransformJob` efêmero e pode levar alguns minutos. Não é um endpoint — o recurso desaparece quando o job termina.
+
+<details>
+<summary><b>💡 Clique para entender: por que o batch não passa pelo Terraform</b></summary>
+<blockquote>
+
+Todos os outros recursos deste lab são **persistentes por design** (mesmo o async, que pode ir a zero, continua existindo como endpoint). Um `TransformJob` é o oposto: nasce, processa e morre sozinho, sem nada para o Terraform "gerenciar" entre uma execução e a próxima, por isso ele é criado direto via Boto3 (`CreateTransformJob`), com um nome carimbado com o timestamp, e não aparece em nenhum `.tf`.
+
+Mecânica: sobe `batch_input.csv` (as mesmas 600 linhas de `test_features.csv`) para um prefixo novo no S3; chama `CreateTransformJob` apontando para esse prefixo, com `MaxConcurrentTransforms=1` e `MaxPayloadInMB=1` (o produto dos dois tem que ser `<= 100`, exigência da API) e `BatchStrategy=MultiRecord` (agrupa várias linhas por mini-lote em vez de uma chamada por linha); espera `DescribeTransformJob` até `Completed`; e por fim **lista** o prefixo de saída no S3 em vez de assumir o nome do arquivo de resultado — o SageMaker decide esse nome, e o lab só confia no que a API realmente gravou.
+
+</blockquote>
+</details>
 
 > Saída esperada (nome do job e duração mudam a cada execução):
 > ```text
@@ -771,6 +865,15 @@ make load
 > ```
 
 O critério de aprovação é `success_rate >= 0.99` em todos os níveis; a latência é registrada, não comparada contra um número fixo.
+
+<details>
+<summary><b>💡 Clique para entender: como o teste de carga dispara as chamadas</b></summary>
+<blockquote>
+
+Para cada nível da matriz (concorrência 1/40 requests, 4/80, 8/120), o comando abre um `ThreadPoolExecutor` com **N** threads (N = a concorrência do nível) e submete todas as requisições de uma vez — o pool garante que nunca mais que N chamadas estejam em voo ao mesmo tempo. Cada chamada envia **uma linha** de `test_features.csv` (não as 5 fixas do `compare`) e mede o tempo de parede da chamada, sucesso ou falha. Ao final do nível: `success_rate` é a fração de chamadas sem exceção; `p50`/`p95`/`p99` vêm da mesma interpolação usada no `compare`; e `requests_per_second` é simplesmente `requests / tempo_total_do_nível`, não a soma dos tempos individuais — é por isso que o RPS cresce com a concorrência mesmo com a latência por chamada estável: mais chamadas acontecendo ao mesmo tempo, não chamadas mais rápidas.
+
+</blockquote>
+</details>
 
 ---
 
@@ -941,6 +1044,15 @@ make destroy
 > ```
 
 Vinte e dois: os nove do estágio 1 (bucket, suas três configurações de segurança, quatro objetos S3 e o training job) mais os treze do estágio 2 (model, três endpoint configs, três endpoints, dois scalable targets, três políticas de scaling e um alarme). O Terraform destrói na ordem inversa da criação: os endpoints e políticas de scaling saem antes do bucket.
+
+<details>
+<summary><b>💡 Clique para entender: como o Terraform decide a ordem de destruição</b></summary>
+<blockquote>
+
+`make destroy` é só `terraform destroy -auto-approve`. A ordem que você vê na saída não está escrita em nenhum lugar do código: o Terraform constrói um grafo de dependências a partir das próprias referências entre recursos (o `Endpoint` referencia o `EndpointConfiguration`, que referencia o `Model`, que referencia o artefato no bucket) e destrói sempre uma folha do grafo antes do que ela depende. É o mesmo grafo que decide a ordem de **criação**, só percorrido de trás para frente — por isso o comando nunca tenta apagar um bucket que ainda tem um `Model` apontando para dentro dele.
+
+</blockquote>
+</details>
 
 <details>
 <summary><b>⚠ Se der erro: o destroy falha porque o bucket não está vazio</b></summary>
