@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0.0",
+  "label": "label",
+  "feature_order": ["f0", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9"],
+  "files": {
+    "train.csv": {
+      "header": false,
+      "label_position": "first",
+      "rows": 2800,
+      "columns": 11
+    },
+    "validation.csv": {
+      "header": false,
+      "label_position": "first",
+      "rows": 600,
+      "columns": 11
+    },
+    "test_labeled.csv": {
+      "header": true,
+      "columns": ["id", "f0", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "label"],
+      "rows": 600
+    },
+    "test_features.csv": {
+      "header": false,
+      "label_present": false,
+      "rows": 600,
+      "columns": 10
+    },
+    "async_payload.csv": {
+      "header": false,
+      "label_present": false,
+      "rows": 50,
+      "columns": 10
+    },
+    "batch_input.csv": {
+      "header": false,
+      "label_present": false,
+      "rows": 600,
+      "columns": 10
+    }
+  },
+  "checks": [
+    "files.present",
+    "row_count.exact",
+    "column_count.exact",
+    "label.binary",
+    "values.no_nan_or_inf",
+    "feature_order.consistent_across_files",
+    "test_features.label_absent",
+    "csv.canonical_serialization",
+    "manifest.sha256_matches_files"
+  ]
+}

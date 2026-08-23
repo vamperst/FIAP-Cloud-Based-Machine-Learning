@@ -1,0 +1,29 @@
+# Credentials never enter this repository.
+.env
+.env.*
+.aws/
+*.pem
+*.ppk
+
+# Terraform state describes live infrastructure and can contain sensitive values.
+terraform.tfstate
+terraform.tfstate.*
+.terraform/
+terraform.tfvars
+crash.log
+crash.*.log
+
+# Handoff file written by scripts/lab.py during `make apply`.
+terraform/artifact.auto.tfvars.json
+
+# Everything generated at runtime.
+artifacts/
+build/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.mypy_cache/
+.ruff_cache/
