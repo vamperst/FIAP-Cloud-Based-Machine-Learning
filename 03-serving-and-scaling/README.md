@@ -108,6 +108,8 @@ O target tracking do Real-Time (`SageMakerVariantInvocationsPerInstance`) fica *
 
 Por isso o Passo 21 (`make scale-demo`) não espera o tráfego real disparar a política: ele eleva o `MinCapacity`/`MaxCapacity` do scalable target diretamente via Application Auto Scaling, prova por `DescribeEndpoint` que a contagem de instâncias foi de 1 para 2, e depois restaura exatamente a configuração que o Terraform gerencia (`MinCapacity=1`, `MaxCapacity=2`). A política de target tracking continua lá, pronta para reagir a tráfego real fora da aula.
 
+📚 Documentação oficial: [Automatic scaling for real-time endpoints](https://docs.aws.amazon.com/sagemaker/latest/dg/endpoint-auto-scaling.html) e [Configure a scaling policy](https://docs.aws.amazon.com/sagemaker/latest/dg/endpoint-auto-scaling-policy.html).
+
 </blockquote>
 </details>
 
@@ -364,6 +366,8 @@ A prevalência de churn (~34,5%) e a separação das classes foram calibradas pa
 
 A partir das mesmas 600 linhas de teste, o script grava **três arquivos diferentes**, cada um no formato que o consumidor exige: `test_labeled.csv` (com `id` e rótulo, para você auditar), `test_features.csv` (sem rótulo, para `compare`/`load`) e `batch_input.csv` (sem rótulo, para o Passo 17): os dois últimos têm o mesmo conteúdo e por isso o mesmo hash SHA-256 no Passo 7. `async_payload.csv` é só as primeiras 50 linhas de `test_features.csv`.
 
+📚 Documentação oficial: [`sklearn.datasets.make_classification`](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_classification.html) e [`train_test_split` (parâmetro `stratify`)](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html).
+
 </blockquote>
 </details>
 
@@ -547,6 +551,8 @@ Repare que o job de treino é criado em 1 segundo, mas o treino em si não termi
 
 Nunca existe um momento em que o Terraform "adivinha" o caminho do artefato: cada estágio só lê o que o estágio anterior provou.
 
+📚 Documentação oficial: [Train a Model with Amazon SageMaker](https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-training.html) e a referência da API [`DescribeTrainingJob`](https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_DescribeTrainingJob.html) (é o campo `ModelArtifacts.S3ModelArtifacts` dessa resposta que o Passo 10 lê).
+
 </blockquote>
 </details>
 
@@ -621,6 +627,8 @@ make status
 
 Nenhum valor vem do Terraform ou de arquivo local. Para cada um dos três endpoints, o comando chama `DescribeEndpoint` (status e `CurrentInstanceCount`); para o real-time e o async, chama também `DescribeScalableTargets` e `DescribeScalingPolicies` do Application Auto Scaling, filtrando pelo `resource_id` daquele endpoint (`endpoint/<nome>/variant/AllTraffic`). É só leitura: nada aqui cria, altera ou destrói recurso, por isso pode ser rodado quantas vezes quiser sem custo nem risco.
 
+📚 Documentação oficial: referência da API [`DescribeEndpoint`](https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_DescribeEndpoint.html) e [`DescribeScalableTargets`](https://docs.aws.amazon.com/autoscaling/application/APIReference/API_DescribeScalableTargets.html).
+
 </blockquote>
 </details>
 
@@ -676,6 +684,8 @@ make compare
 <blockquote>
 
 O comando pega uma lista fixa de 5 linhas de `test_features.csv` (as mesmas para os dois modos) e monta um único payload CSV com as 5. Para cada endpoint: faz **1 chamada isolada** e cronometra só ela (`first_ms`); depois faz **20 chamadas sequenciais** com o mesmo payload e guarda cada tempo de resposta, do qual calcula p50 e p95 por interpolação linear entre as amostras ordenadas. Ao final, compara as predictions da última chamada de cada modo, posição a posição, com tolerância `1e-6` — se qualquer par diferir mais que isso, `predictions_match` vira `False` e o comando termina com erro.
+
+📚 Documentação oficial: [Serverless Inference](https://docs.aws.amazon.com/sagemaker/latest/dg/serverless-endpoints.html) e [Create a serverless inference endpoint configuration](https://docs.aws.amazon.com/sagemaker/latest/dg/serverless-endpoints-create-config.html) — a seção "Considerations" ali explica o comportamento de first-request que você acabou de medir.
 
 </blockquote>
 </details>
@@ -749,6 +759,8 @@ Quatro passos, todos dentro de `make async`: (1) sobe `async_payload.csv` (50 li
 
 O ganho de arquitetura está no passo 2: quem chamou não fica esperando a resposta HTTP como no real-time; só recebe um "protocolo" (onde buscar o resultado) e segue a vida.
 
+📚 Documentação oficial: [Asynchronous Inference](https://docs.aws.amazon.com/sagemaker/latest/dg/async-inference.html) e [Create an asynchronous inference endpoint](https://docs.aws.amazon.com/sagemaker/latest/dg/async-inference-create-endpoint-create-endpoint-config.html).
+
 </blockquote>
 </details>
 
@@ -801,6 +813,8 @@ make batch
 Todos os outros recursos deste lab são **persistentes por design** (mesmo o async, que pode ir a zero, continua existindo como endpoint). Um `TransformJob` é o oposto: nasce, processa e morre sozinho, sem nada para o Terraform "gerenciar" entre uma execução e a próxima, por isso ele é criado direto via Boto3 (`CreateTransformJob`), com um nome carimbado com o timestamp, e não aparece em nenhum `.tf`.
 
 Mecânica: sobe `batch_input.csv` (as mesmas 600 linhas de `test_features.csv`) para um prefixo novo no S3; chama `CreateTransformJob` apontando para esse prefixo, com `MaxConcurrentTransforms=1` e `MaxPayloadInMB=1` (o produto dos dois tem que ser `<= 100`, exigência da API) e `BatchStrategy=MultiRecord` (agrupa várias linhas por mini-lote em vez de uma chamada por linha); espera `DescribeTransformJob` até `Completed`; e por fim **lista** o prefixo de saída no S3 em vez de assumir o nome do arquivo de resultado — o SageMaker decide esse nome, e o lab só confia no que a API realmente gravou.
+
+📚 Documentação oficial: [Use Batch Transform to Get Inferences](https://docs.aws.amazon.com/sagemaker/latest/dg/batch-transform.html) — a seção sobre `MaxPayloadInMB`/`MaxConcurrentTransforms` explica o limite de 100 citado acima.
 
 </blockquote>
 </details>
@@ -872,6 +886,8 @@ O critério de aprovação é `success_rate >= 0.99` em todos os níveis; a lat�
 
 Para cada nível da matriz (concorrência 1/40 requests, 4/80, 8/120), o comando abre um `ThreadPoolExecutor` com **N** threads (N = a concorrência do nível) e submete todas as requisições de uma vez — o pool garante que nunca mais que N chamadas estejam em voo ao mesmo tempo. Cada chamada envia **uma linha** de `test_features.csv` (não as 5 fixas do `compare`) e mede o tempo de parede da chamada, sucesso ou falha. Ao final do nível: `success_rate` é a fração de chamadas sem exceção; `p50`/`p95`/`p99` vêm da mesma interpolação usada no `compare`; e `requests_per_second` é simplesmente `requests / tempo_total_do_nível`, não a soma dos tempos individuais — é por isso que o RPS cresce com a concorrência mesmo com a latência por chamada estável: mais chamadas acontecendo ao mesmo tempo, não chamadas mais rápidas.
 
+📚 Documentação oficial: [Load test and optimize an endpoint](https://docs.aws.amazon.com/sagemaker/latest/dg/endpoint-scaling-loadtest.html) — a AWS recomenda esse mesmo tipo de teste antes de calibrar o `target_value` de uma política de scaling.
+
 </blockquote>
 </details>
 
@@ -920,6 +936,8 @@ A espera de cada transição pode variar; o timeout é de até 600 segundos por 
 Subir de 1 para 2 funciona só com `RegisterScalableTarget`: quando o `MinCapacity` novo é maior que a capacidade atual, o Application Auto Scaling agenda a ação de scale-out sozinho. Descer de 2 para 1 **não é simétrico**: abaixar o `MaxCapacity` de volta para o valor gerenciado pelo Terraform não faz o serviço encolher a capacidade atual — isso só aconteceria quando a política de target tracking avaliasse o alarme de baixa utilização, o que pode levar mais que os 600 segundos do timeout desta demonstração.
 
 Por isso o comando força o `DesiredInstanceCount` diretamente via `UpdateEndpointWeightsAndCapacities` (a mesma API que a política de scaling usaria por trás dos panos) e só então confirma que o Terraform e a AWS concordam nos limites (`min=1`, `max=2`).
+
+📚 Documentação oficial: referência da API [`UpdateEndpointWeightsAndCapacities`](https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_UpdateEndpointWeightsAndCapacities.html) e [`RegisterScalableTarget`](https://docs.aws.amazon.com/autoscaling/application/APIReference/API_RegisterScalableTarget.html) do Application Auto Scaling.
 
 </blockquote>
 </details>
@@ -1050,6 +1068,8 @@ Vinte e dois: os nove do estágio 1 (bucket, suas três configurações de segur
 <blockquote>
 
 `make destroy` é só `terraform destroy -auto-approve`. A ordem que você vê na saída não está escrita em nenhum lugar do código: o Terraform constrói um grafo de dependências a partir das próprias referências entre recursos (o `Endpoint` referencia o `EndpointConfiguration`, que referencia o `Model`, que referencia o artefato no bucket) e destrói sempre uma folha do grafo antes do que ela depende. É o mesmo grafo que decide a ordem de **criação**, só percorrido de trás para frente — por isso o comando nunca tenta apagar um bucket que ainda tem um `Model` apontando para dentro dele.
+
+📚 Documentação oficial: [Resource dependencies](https://developer.hashicorp.com/terraform/language/resources/behavior#resource-dependencies) e [The Dependency Graph](https://developer.hashicorp.com/terraform/internals/graph) no manual do Terraform.
 
 </blockquote>
 </details>
